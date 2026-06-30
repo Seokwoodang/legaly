@@ -64,7 +64,7 @@ export const dataClient: DataClient = {
     try { return await edgeGet<CaseDetail>(`kind=case&id=${encodeURIComponent(id)}&team=${encodeURIComponent(team)}`); }
     catch { return sampleCase(team, id); }
   },
-  async getAnswer(team, question) {
+  async getAnswer(team, question, model) {
     if (!useSupabase) return ANSWERS[team];
     // AI 답변은 로그인 필수 → 사용자 세션 JWT를 Authorization으로 전송.
     const { data } = await supabase().auth.getSession();
@@ -72,7 +72,7 @@ export const dataClient: DataClient = {
     const res = await fetch(`${EDGE_BASE}/answer`, {
       method: 'POST',
       headers: { 'content-type': 'application/json', apikey: ANON ?? '', authorization: `Bearer ${token}` },
-      body: JSON.stringify({ team, question }),
+      body: JSON.stringify({ team, question, model }), // model: 'sonnet'|'opus' (서버에서 화이트리스트 검증)
     });
     if (!res.ok) throw new Error(`answer ${res.status}`);
     return res.json() as Promise<AnswerPayload>;

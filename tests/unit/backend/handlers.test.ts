@@ -90,6 +90,8 @@ function answerDeps(over: Partial<Parameters<typeof handleAnswer>[1]> = {}) {
   } as Parameters<typeof handleAnswer>[1];
 }
 
+const lastModel = (fn: any) => fn.mock.calls.at(-1)?.[3];
+
 describe('handleAnswer (RAG + Claude)', () => {
   it('정상 → 200 {text, sources}', async () => {
     const r = await handleAnswer({ team: '법무', question: '보증금 못 받았어요' }, answerDeps());
@@ -116,5 +118,20 @@ describe('handleAnswer (RAG + Claude)', () => {
   it('Claude 실패 → 502', async () => {
     const r = await handleAnswer({ team: '법무', question: 'q' }, answerDeps({ callClaude: vi.fn(async () => { throw new Error('claude down'); }) }));
     expect(r.status).toBe(502);
+  });
+  it('model 미지정 → 기본 sonnet 모델 ID로 호출', async () => {
+    const deps = answerDeps();
+    await handleAnswer({ team: '법무', question: 'q' }, deps);
+    expect(lastModel(deps.callClaude)).toBe('claude-sonnet-4-6');
+  });
+  it("model='opus' → opus 모델 ID로 호출", async () => {
+    const deps = answerDeps();
+    await handleAnswer({ team: '법무', question: 'q', model: 'opus' }, deps);
+    expect(lastModel(deps.callClaude)).toBe('claude-opus-4-8');
+  });
+  it('알 수 없는 model → 기본 sonnet으로 폴백(임의 문자열 주입 방지)', async () => {
+    const deps = answerDeps();
+    await handleAnswer({ team: '법무', question: 'q', model: 'gpt-4o' } as any, deps);
+    expect(lastModel(deps.callClaude)).toBe('claude-sonnet-4-6');
   });
 });

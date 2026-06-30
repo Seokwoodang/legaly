@@ -53,12 +53,12 @@ Deno.serve(async (req: Request) => {
     const { status, body: out } = await handleAnswer(body, {
       retrieve: hybridRetrieve,
       rateCheck: () => rateCheck(ip),
-      callClaude: async (team, q, sources) => {
+      callClaude: async (team, q, sources, modelId) => {
         const m = buildAnswerMessages(team, q, sources);
         const c = new AbortController();
         const t = setTimeout(() => c.abort(), 20_000);
         try {
-          return await callClaude({ system: m.system, user: m.user, apiKey }, (u, init) => fetch(u, { ...init, signal: c.signal }));
+          return await callClaude({ system: m.system, user: m.user, apiKey, model: modelId }, (u, init) => fetch(u, { ...init, signal: c.signal }));
         } finally { clearTimeout(t); }
       },
     });

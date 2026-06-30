@@ -10,3 +10,4 @@ tests/e2e/**/*-snapshots
 supabase/.env*
 supabase/.branches
 supabase/.temp
+.vercel

@@ -6,7 +6,7 @@ import { peekPendingQ, clearPendingQ } from '../lib/storage';
 import { greeting, STARTERS, PLACEHOLDER } from '../lib/sampleData';
 import { makeId, summarize, formatSavedDate } from '../lib/format';
 import { TEAMS, C } from '../theme';
-import type { ChatMessage, Team } from '../types';
+import type { ChatMessage, Team, ModelChoice } from '../types';
 import Header from '../components/Header';
 import AuthModal from '../components/AuthModal';
 import Icon from '../components/Icon';
@@ -25,6 +25,7 @@ export default function ConsultPage() {
   const [toast, setToast] = useState('');
   const [sending, setSending] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
+  const [model, setModel] = useState<ModelChoice>('sonnet'); // AI 모델 선택(빠름 vs 똑똑)
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const mountedRef = useRef(true);
@@ -77,7 +78,7 @@ export default function ConsultPage() {
     setMessages(m => [...m, { id: uid, role: 'user', text }, { id: pid, role: 'ai', kind: 'pending' }]);
     setSending(true);
     try {
-      const ans = await dataClient.getAnswer(teamSnap, text);
+      const ans = await dataClient.getAnswer(teamSnap, text, model);
       if (!mountedRef.current) return;
       setMessages(m => m.map(msg => msg.id === pid ? { id: pid, role: 'ai', kind: 'answer', q: text, text: ans.text, sources: ans.sources, savable: true } : msg));
       setExpanded(e => ({ ...e, [pid]: true }));
@@ -176,6 +177,16 @@ export default function ConsultPage() {
 
       <div style={{ flexShrink: 0, background: C.surfaceHeader, borderTop: `1px solid ${C.border}` }}>
         <div style={{ maxWidth: 760, margin: '0 auto', padding: '14px 24px 18px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 9 }}>
+            <span style={{ fontSize: 11.5, fontWeight: 600, color: C.faint3 }}>AI 모델</span>
+            <div style={{ display: 'inline-flex', background: '#fff', border: `1px solid ${C.border2}`, borderRadius: 999, padding: 3, gap: 2 }}>
+              {([['sonnet', '빠름 (Sonnet)'], ['opus', '똑똑 (Opus)']] as [ModelChoice, string][]).map(([key, label]) => (
+                <button key={key} type="button" disabled={sending} onClick={() => setModel(key)}
+                  title={key === 'sonnet' ? '빠르고 가벼운 기본 모델' : '더 깊은 추론 — 느리지만 더 똑똑함'}
+                  style={{ border: 'none', borderRadius: 999, padding: '5px 12px', fontSize: 12, fontWeight: 700, fontFamily: 'inherit', cursor: sending ? 'default' : 'pointer', background: model === key ? cfg.accent : 'transparent', color: model === key ? '#fff' : '#7c8590' }}>{label}</button>
+              ))}
+            </div>
+          </div>
           <div style={{ display: 'flex', alignItems: 'flex-end', gap: 10, background: '#fff', border: `1px solid ${C.border2}`, borderRadius: 16, padding: '8px 8px 8px 16px' }}>
             <textarea rows={1} disabled={sending} placeholder={PLACEHOLDER[team]} value={draft}
               onChange={e => setDraft(e.target.value)}

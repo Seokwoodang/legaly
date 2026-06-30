@@ -43,12 +43,14 @@ export type ChatMessage =
 import type { Guide } from './lib/guidesData';
 export type { Guide };
 
+export type ModelChoice = 'sonnet' | 'opus';
+
 export interface DataClient {
   getLaws(team: Team): Promise<LawListItem[]>;
   getLaw(team: Team, id: string): Promise<LawDetail>;
   getCases(team: Team): Promise<CaseListItem[]>;
   getCase(team: Team, id: string): Promise<CaseDetail>;
-  getAnswer(team: Team, question: string): Promise<AnswerPayload>;
+  getAnswer(team: Team, question: string, model?: ModelChoice): Promise<AnswerPayload>;
   getGuides(team: Team): Promise<Guide[]>;
   getGuide(team: Team, id: string): Promise<Guide | null>;
   getSaved(): Promise<SavedItem[]>;
