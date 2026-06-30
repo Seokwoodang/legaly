@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<style>
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:'Pretendard','Pretendard Variable',-apple-system,sans-serif;background:#f5f4f1;color:#22272e;-webkit-font-smoothing:antialiased;}
+  a{color:inherit;}
+  ::selection{background:#dbe7df;}
+  .mono{font-family:'SF Mono',ui-monospace,'Menlo','Consolas',monospace;}
+  input:focus{outline:none;}
+</style>
+</helmet>
+
+<div style="min-height:100vh;display:flex;flex-direction:column;">
+
+  <header style="background:#fbfaf8;border-bottom:1px solid #ece9e3;position:sticky;top:0;z-index:50;">
+    <div style="max-width:1040px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:16px;height:60px;">
+      <a href="index.dc.html" style="display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0;">
+        <span style="width:34px;height:34px;border-radius:10px;background:#102a43;color:#fff;display:flex;align-items:center;justify-content:center;padding:8px;">{{ logoIcon }}</span>
+        <span style="font-size:17px;font-weight:800;color:#102a43;letter-spacing:-.02em;">리걸리</span>
+      </a>
+      <div style="display:inline-flex;background:#efece6;border-radius:11px;padding:4px;gap:4px;margin-left:6px;">
+        <button onClick="{{ onLaw }}" style="{{ lawTabStyle }}"><span style="width:15px;height:15px;display:inline-flex;">{{ lawSegIcon }}</span>법무팀</button>
+        <button onClick="{{ onTax }}" style="{{ taxTabStyle }}"><span style="width:15px;height:15px;display:inline-flex;">{{ taxSegIcon }}</span>세무팀</button>
+      </div>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:10px;position:relative;">
+        <sc-if value="{{ loggedOut }}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{ openAuth }}" style="padding:8px 16px;border-radius:10px;border:none;background:#102a43;color:#fff;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">로그인</button>
+        </sc-if>
+        <sc-if value="{{ loggedIn }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ toggleMenu }}" style="display:flex;align-items:center;gap:8px;padding:5px 11px 5px 5px;border-radius:999px;border:1px solid #e6e2da;background:#fff;font-family:inherit;cursor:pointer;">
+            <span style="width:28px;height:28px;border-radius:50%;background:#102a43;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:700;">{{ userInitial }}</span>
+            <span style="font-size:13.5px;font-weight:700;color:#22272e;">{{ userName }}님</span>
+          </button>
+          <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;top:48px;right:0;background:#fff;border:1px solid #e6e2da;border-radius:12px;box-shadow:0 16px 40px -16px rgba(0,0,0,.25);padding:6px;min-width:150px;z-index:60;">
+              <a href="saved.dc.html" style="display:block;padding:9px 12px;border-radius:8px;font-size:14px;font-weight:600;color:#3f4a55;text-decoration:none;">내 보관함</a>
+              <button onClick="{{ logout }}" style="width:100%;text-align:left;padding:9px 12px;border-radius:8px;border:none;background:transparent;font-size:14px;font-weight:600;color:#b04a3e;font-family:inherit;cursor:pointer;">로그아웃</button>
+            </div>
+          </sc-if>
+        </sc-if>
+      </div>
+    </div>
+    <div style="border-top:1px solid #f0ede7;">
+      <div style="max-width:1040px;margin:0 auto;padding:0 24px;display:flex;gap:4px;overflow-x:auto;">
+        <a href="ai.dc.html" style="{{ navAsk }}">상담</a>
+        <a href="guides.dc.html" style="{{ navGuide }}">절차 가이드</a>
+        <a href="laws.dc.html" style="{{ navLib }}">자료실</a>
+        <a href="cases.dc.html" style="{{ navCase }}">판례</a>
+        <a href="saved.dc.html" style="{{ navSaved }}">보관함</a>
+      </div>
+    </div>
+  </header>
+
+  <sc-if value="{{ ready }}" hint-placeholder-val="{{ false }}">
+
+  <div style="background:{{ tintBg }};border-bottom:1px solid #ece9e3;">
+    <div style="max-width:1000px;margin:0 auto;padding:clamp(26px,3.5vw,42px) 24px;">
+      <div style="font-size:13px;color:#6b7480;margin-bottom:16px;"><a href="guides.dc.html" style="color:#6b7480;text-decoration:none;">{{ teamLabel }} 절차 가이드</a> <span style="opacity:.5;">/</span> {{ field }}</div>
+      <div style="display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap;">
+        <span style="width:58px;height:58px;border-radius:16px;display:flex;align-items:center;justify-content:center;padding:16px;background:#fff;color:{{ tintFg }};flex-shrink:0;">{{ fieldIcon }}</span>
+        <div style="flex:1;min-width:240px;">
+          <h1 style="font-size:clamp(25px,3.6vw,36px);font-weight:800;letter-spacing:-.02em;margin:0 0 10px;color:#1b2530;line-height:1.3;">{{ title }}</h1>
+          <p style="font-size:15.5px;line-height:1.7;color:#46505a;margin:0;max-width:640px;">{{ intro }}</p>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:20px;">
+        <div style="background:#fff;border-radius:11px;padding:10px 16px;"><div style="font-size:11px;color:#9b958a;font-weight:600;margin-bottom:2px;">예상 기간</div><div style="font-size:14px;font-weight:700;color:#1b2530;">{{ duration }}</div></div>
+        <div style="background:#fff;border-radius:11px;padding:10px 16px;"><div style="font-size:11px;color:#9b958a;font-weight:600;margin-bottom:2px;">난이도</div><div style="font-size:14px;font-weight:700;color:#1b2530;">{{ difficulty }}</div></div>
+        <div style="background:#fff;border-radius:11px;padding:10px 16px;"><div style="font-size:11px;color:#9b958a;font-weight:600;margin-bottom:2px;">단계</div><div style="font-size:14px;font-weight:700;color:#1b2530;">{{ stepCount }}단계</div></div>
+      </div>
+    </div>
+  </div>
+
+  <main style="flex:1;max-width:1000px;width:100%;margin:0 auto;padding:clamp(26px,4vw,38px) 24px clamp(48px,7vw,72px);display:flex;gap:clamp(24px,4vw,40px);flex-wrap:wrap;align-items:flex-start;">
+
+    <aside style="flex:1 1 230px;max-width:300px;position:sticky;top:128px;display:flex;flex-direction:column;gap:14px;">
+      <div style="background:#fff;border:1px solid #ece9e3;border-radius:16px;padding:18px;">
+        <div style="font-size:12px;font-weight:800;color:#9b958a;letter-spacing:.04em;margin-bottom:13px;">필요 서류</div>
+        <div style="display:flex;flex-direction:column;gap:9px;">
+          <sc-for list="{{ documents }}" as="d" hint-placeholder-count="4">
+            <div style="display:flex;align-items:flex-start;gap:9px;font-size:13.5px;color:#3f4a55;line-height:1.5;">
+              <span style="flex-shrink:0;width:18px;height:18px;border-radius:5px;background:{{ tintBg }};color:{{ tintFg }};display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;margin-top:1px;">✓</span>{{ d.text }}
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <div style="background:#fff;border:1px solid #ece9e3;border-radius:16px;padding:18px;">
+        <div style="font-size:12px;font-weight:800;color:#9b958a;letter-spacing:.04em;margin-bottom:13px;">기한·주의</div>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <sc-for list="{{ deadlines }}" as="dl" hint-placeholder-count="2">
+            <div><div style="font-size:12px;color:#a08a86;font-weight:600;margin-bottom:2px;">{{ dl.k }}</div><div style="font-size:14px;font-weight:700;color:#b04a3e;">{{ dl.v }}</div></div>
+          </sc-for>
+        </div>
+      </div>
+      <sc-if value="{{ hasCosts }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#fff;border:1px solid #ece9e3;border-radius:16px;padding:18px;">
+          <div style="font-size:12px;font-weight:800;color:#9b958a;letter-spacing:.04em;margin-bottom:13px;">비용</div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <sc-for list="{{ costs }}" as="co" hint-placeholder-count="2">
+              <div style="display:flex;justify-content:space-between;gap:10px;font-size:13.5px;"><span style="color:#6b7480;">{{ co.k }}</span><span style="font-weight:700;color:#1b2530;">{{ co.v }}</span></div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+    </aside>
+
+    <article style="flex:1 1 520px;min-width:0;display:flex;flex-direction:column;gap:16px;">
+
+      <section style="background:#fff;border:1px solid #ece9e3;border-radius:18px;padding:clamp(22px,3.5vw,34px);">
+        <div style="display:flex;align-items:center;gap:9px;margin-bottom:22px;">
+          <span style="width:4px;height:18px;border-radius:2px;background:{{ accent }};"></span>
+          <h2 style="font-size:20px;font-weight:800;color:#1b2530;margin:0;">단계별 절차</h2>
+        </div>
+        <div style="display:flex;flex-direction:column;">
+          <sc-for list="{{ steps }}" as="s" hint-placeholder-count="5">
+            <div style="display:flex;gap:16px;">
+              <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;">
+                <span style="width:34px;height:34px;border-radius:50%;background:{{ tintBg }};color:{{ tintFg }};display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;">{{ s.no }}</span>
+                <span style="{{ s.lineStyle }}"></span>
+              </div>
+              <div style="flex:1;min-width:0;padding-bottom:{{ s.pad }};">
+                <div style="font-size:16.5px;font-weight:800;color:#1b2530;margin-bottom:6px;letter-spacing:-.01em;">{{ s.t }}</div>
+                <p style="font-size:14.5px;line-height:1.75;color:#4a535d;margin:0;">{{ s.d }}</p>
+                <sc-if value="{{ s.hasTip }}" hint-placeholder-val="{{ false }}">
+                  <div style="margin-top:10px;display:flex;align-items:flex-start;gap:8px;background:{{ tintBg }};border-radius:10px;padding:10px 13px;font-size:13px;line-height:1.6;color:{{ tintFg }};">
+                    <span style="font-weight:800;flex-shrink:0;">팁</span><span>{{ s.tip }}</span>
+                  </div>
+                </sc-if>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+
+      <section style="background:#fff;border:1px solid #ece9e3;border-radius:18px;padding:clamp(22px,3.5vw,34px);">
+        <div style="display:flex;align-items:center;gap:9px;margin-bottom:16px;">
+          <span style="width:4px;height:18px;border-radius:2px;background:{{ accent }};"></span>
+          <h2 style="font-size:20px;font-weight:800;color:#1b2530;margin:0;">근거 법령</h2>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <sc-for list="{{ laws }}" as="l" hint-placeholder-count="2">
+            <a href="law-detail.dc.html" style="text-decoration:none;background:#faf9f7;border:1px solid #ece9e3;border-radius:12px;padding:15px 17px;display:block;" style-hover="border-color:#dcd7cd;">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap;">
+                <span style="font-size:11px;font-weight:800;color:#fff;padding:2px 8px;border-radius:5px;background:{{ accent }};">법령</span>
+                <span style="font-weight:700;font-size:14.5px;color:#1b2530;">{{ l.title }}</span>
+                <span class="mono" style="font-size:12.5px;font-weight:600;color:{{ accent }};">{{ l.article }}</span>
+              </div>
+              <div style="font-size:13.5px;line-height:1.65;color:#5b636d;">{{ l.note }}</div>
+            </a>
+          </sc-for>
+        </div>
+      </section>
+
+      <sc-if value="{{ hasCases }}" hint-placeholder-val="{{ false }}">
+        <section style="background:#fff;border:1px solid #ece9e3;border-radius:18px;padding:clamp(22px,3.5vw,34px);">
+          <div style="display:flex;align-items:center;gap:9px;margin-bottom:16px;">
+            <span style="width:4px;height:18px;border-radius:2px;background:{{ accent }};"></span>
+            <h2 style="font-size:20px;font-weight:800;color:#1b2530;margin:0;">참고 판례</h2>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <sc-for list="{{ cases }}" as="c" hint-placeholder-count="1">
+              <a href="case-detail.dc.html" style="text-decoration:none;background:#faf9f7;border:1px solid #ece9e3;border-radius:12px;padding:15px 17px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;" style-hover="border-color:#dcd7cd;">
+                <span style="font-size:11px;font-weight:800;color:#fff;background:#102a43;padding:2px 8px;border-radius:5px;">판례</span>
+                <span style="flex:1;min-width:160px;font-weight:700;font-size:14.5px;color:#1b2530;">{{ c.name }}</span>
+                <span class="mono" style="font-size:12.5px;color:#8a8579;">{{ c.number }}</span>
+              </a>
+            </sc-for>
+          </div>
+        </section>
+      </sc-if>
+
+      <div style="border-radius:16px;padding:22px 24px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;background:{{ tintBg }};border:1px solid #ece9e3;">
+        <div style="flex:1;min-width:200px;">
+          <div style="font-size:15.5px;font-weight:700;color:#1b2530;margin-bottom:3px;">내 상황에 맞는지 확인하고 싶다면</div>
+          <div style="font-size:13.5px;color:#5b636d;">{{ teamLabel }}에게 물어보면 이 절차가 내 사정에 어떻게 적용되는지 알려드려요.</div>
+        </div>
+        <a href="ai.dc.html" onClick="{{ askAboutGuide }}" style="flex-shrink:0;color:#fff;text-decoration:none;font-size:14px;font-weight:700;padding:12px 20px;border-radius:11px;background:{{ accent }};">{{ teamLabel }}에게 질문 →</a>
+      </div>
+
+      <a href="guides.dc.html" style="text-decoration:none;text-align:center;background:#fff;border:1px solid #dcd7cd;border-radius:12px;padding:13px;font-size:14px;font-weight:700;color:#3f4a55;">← 가이드 목록으로</a>
+
+    </article>
+
+  </main>
+
+  </sc-if>
+
+  <sc-if value="{{ notReady }}" hint-placeholder-val="{{ true }}">
+    <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:80px 24px;color:#9b958a;font-size:15px;">가이드를 불러오는 중…</div>
+  </sc-if>
+
+  <sc-if value="{{ authOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeAuth }}" style="position:fixed;inset:0;background:rgba(16,28,40,.5);display:flex;align-items:center;justify-content:center;padding:24px;z-index:100;">
+      <div onClick="{{ stop }}" style="background:#fff;border-radius:20px;padding:clamp(28px,4vw,40px);max-width:400px;width:100%;box-shadow:0 30px 70px -20px rgba(0,0,0,.5);">
+        <div style="width:46px;height:46px;border-radius:13px;background:#102a43;color:#fff;display:flex;align-items:center;justify-content:center;font-size:21px;font-weight:700;margin-bottom:18px;">法</div>
+        <h2 style="font-size:22px;font-weight:800;letter-spacing:-.02em;margin:0 0 8px;color:#1b2530;">리걸리 시작하기</h2>
+        <p style="font-size:14px;color:#6b7480;margin:0 0 22px;line-height:1.6;">이름을 알려주시면 전담 법무팀·세무팀이 맞이할게요.</p>
+        <label style="display:block;font-size:12.5px;font-weight:700;color:#8a8579;margin-bottom:7px;">이름 또는 닉네임</label>
+        <input type="text" value="{{ authName }}" onInput="{{ authInput }}" onKeyDown="{{ authKey }}" placeholder="예) 김리걸" style="width:100%;border:1px solid #dcd7cd;border-radius:11px;padding:13px 15px;font-size:15px;font-family:inherit;color:#1b2530;background:#faf9f7;margin-bottom:18px;" style-focus="border-color:#102a43;background:#fff;">
+        <button onClick="{{ submitAuth }}" style="width:100%;border:none;border-radius:11px;background:#102a43;color:#fff;font-size:15.5px;font-weight:700;padding:14px;font-family:inherit;cursor:pointer;">시작하기</button>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    let team = '법무', user = null, guideId = null;
+    try { const s = localStorage.getItem('legaly.team'); if (s === '법무' || s === '세무') team = s; } catch (e) {}
+    try { const u = localStorage.getItem('legaly.user'); if (u) user = JSON.parse(u); } catch (e) {}
+    try { guideId = localStorage.getItem('legaly.guide'); } catch (e) {}
+    this.state = { team, user, guideId, guides: [], tints: {}, authOpen: false, menuOpen: false, authName: '' };
+  }
+
+  TEAMS = {
+    '법무': { accent: '#1b4f8a', soft: '#eaf1f8', label: '법무팀', glyph: '法' },
+    '세무': { accent: '#157a57', soft: '#e7f3ec', label: '세무팀', glyph: '稅' }
+  };
+
+  componentDidMount() {
+    import('./guides-data.js').then(m => { this.setState({ guides: m.GUIDES, tints: m.FIELD_TINT }); }).catch(() => {});
+  }
+
+  findGuide() {
+    const { guides, guideId, team } = this.state;
+    if (!guides.length) return null;
+    return guides.find(g => g.id === guideId) || guides.find(g => g.team === team) || guides[0];
+  }
+
+  setTeamLS = (t) => { try { localStorage.setItem('legaly.team', t); } catch (e) {} };
+  switchTeam = (t) => { this.setTeamLS(t); const g = this.state.guides.find(x => x.team === t); if (g) { try { localStorage.setItem('legaly.guide', g.id); } catch (e) {} } this.setState({ team: t, guideId: g ? g.id : this.state.guideId }); };
+  askAboutGuide = () => { const g = this.findGuide(); if (g) { try { localStorage.setItem('legaly.pendingQ', g.title + ' 절차가 제 상황에도 그대로 적용되나요?'); } catch (e) {} } };
+  openAuth = () => this.setState({ authOpen: true, menuOpen: false });
+  closeAuth = () => this.setState({ authOpen: false });
+  authInput = (e) => this.setState({ authName: e.target.value });
+  authKey = (e) => { if (e.key === 'Enter') this.submitAuth(); };
+  submitAuth = () => { const n = (this.state.authName || '').trim() || '고객'; const user = { name: n }; try { localStorage.setItem('legaly.user', JSON.stringify(user)); } catch (e) {} this.setState({ user, authOpen: false, authName: '' }); };
+  toggleMenu = () => this.setState(s => ({ menuOpen: !s.menuOpen }));
+  logout = () => { try { localStorage.removeItem('legaly.user'); } catch (e) {} this.setState({ user: null, menuOpen: false }); };
+  stop = (e) => e.stopPropagation();
+
+  IC = { scale: '<svg viewBox="0 0 24 24" width="100%" height="100%" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg>', calc: '<svg viewBox="0 0 24 24" width="100%" height="100%" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="20" x="4" y="2" rx="2"/><path d="M8 6h8"/><path d="M8 10h.01"/><path d="M12 10h.01"/><path d="M16 10h.01"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14v4"/><path d="M8 18h.01"/><path d="M12 18h.01"/></svg>' };
+  ic(svg) { if (!svg) return null; return React.createElement('span', { style: { display: 'inline-flex', width: '100%', height: '100%' }, dangerouslySetInnerHTML: { __html: svg } }); }
+
+  renderVals() {
+    const { team, user, guides, tints, authOpen, menuOpen, authName } = this.state;
+    const cfg = this.TEAMS[team];
+    const g = this.findGuide();
+    const tint = g ? (tints[g.field] || { bg: cfg.soft, fg: cfg.accent, glyph: cfg.glyph }) : { bg: cfg.soft, fg: cfg.accent, glyph: cfg.glyph };
+
+    const tabBase = 'display:inline-flex;align-items:center;gap:6px;padding:7px 15px;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer;border:none;font-family:inherit;transition:.15s;';
+    const navBase = 'padding:13px 4px;margin-right:18px;font-size:14.5px;font-weight:700;text-decoration:none;white-space:nowrap;border-bottom:2.5px solid transparent;';
+    const navOn = navBase + 'color:' + cfg.accent + ';border-bottom-color:' + cfg.accent + ';';
+    const navOff = navBase + 'color:#8a8579;';
+
+    const common = {
+      ready: !!g, notReady: !g,
+      accent: cfg.accent, soft: cfg.soft, teamLabel: cfg.label,
+      loggedIn: !!user, loggedOut: !user, userName: user ? user.name : '', userInitial: user ? user.name.slice(0, 1) : '',
+      authOpen, menuOpen, authName,
+      lawTabStyle: tabBase + (team === '법무' ? 'background:#1b4f8a;color:#fff;box-shadow:0 2px 8px -2px rgba(27,79,138,.5);' : 'background:transparent;color:#6b6459;'),
+      taxTabStyle: tabBase + (team === '세무' ? 'background:#157a57;color:#fff;box-shadow:0 2px 8px -2px rgba(21,122,87,.5);' : 'background:transparent;color:#6b6459;'),
+      logoIcon: this.ic(this.IC.scale), lawSegIcon: this.ic(this.IC.scale), taxSegIcon: this.ic(this.IC.calc),
+      navAsk: navOff, navGuide: navOn, navLib: navOff, navCase: navOff, navSaved: navOff,
+      onLaw: () => this.switchTeam('법무'), onTax: () => this.switchTeam('세무'), askAboutGuide: this.askAboutGuide,
+      openAuth: this.openAuth, closeAuth: this.closeAuth, authInput: this.authInput, authKey: this.authKey,
+      submitAuth: this.submitAuth, toggleMenu: this.toggleMenu, logout: this.logout, stop: this.stop
+    };
+    if (!g) return common;
+
+    const steps = g.steps.map((s, i) => {
+      const last = i === g.steps.length - 1;
+      return { no: i + 1, t: s.t, d: s.d, hasTip: !!s.tip, tip: s.tip || '', pad: last ? '0' : '26px', lineStyle: last ? 'display:none;' : ('flex:1;width:2px;background:' + tint.bg + ';margin:6px 0;min-height:24px;') };
+    });
+
+    return {
+      ...common,
+      title: g.title, intro: g.intro, field: g.field, fieldIcon: this.ic(tint.svg), tintBg: tint.bg, tintFg: tint.fg,
+      duration: g.duration, difficulty: g.difficulty, stepCount: g.steps.length,
+      steps,
+      documents: (g.documents || []).map(d => ({ text: d })),
+      deadlines: g.deadlines || [],
+      hasCosts: !!(g.costs && g.costs.length), costs: g.costs || [],
+      laws: g.laws || [],
+      hasCases: !!(g.cases && g.cases.length), cases: g.cases || []
+    };
+  }
+}
+</script>
+</body>
+</html>

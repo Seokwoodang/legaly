@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<style>
+  *{box-sizing:border-box;}
+  html,body{margin:0;height:100%;font-family:'Pretendard','Pretendard Variable',-apple-system,sans-serif;background:#f1efea;color:#22272e;-webkit-font-smoothing:antialiased;}
+  a{color:inherit;}
+  ::selection{background:#dbe7df;}
+  .mono{font-family:'SF Mono',ui-monospace,'Menlo','Consolas',monospace;}
+  input:focus,textarea:focus{outline:none;}
+  .chatscroll::-webkit-scrollbar{width:10px;}
+  .chatscroll::-webkit-scrollbar-thumb{background:#d6d1c7;border-radius:8px;border:3px solid #f1efea;}
+</style>
+</helmet>
+
+<div style="height:100dvh;display:flex;flex-direction:column;">
+
+  <header style="flex-shrink:0;background:#fbfaf8;border-bottom:1px solid #ece9e3;z-index:50;">
+    <div style="max-width:1040px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:16px;height:60px;">
+      <a href="index.dc.html" style="display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0;">
+        <span style="width:34px;height:34px;border-radius:10px;background:#102a43;color:#fff;display:flex;align-items:center;justify-content:center;padding:8px;">{{ logoIcon }}</span>
+        <span style="font-size:17px;font-weight:800;color:#102a43;letter-spacing:-.02em;">리걸리</span>
+      </a>
+      <div style="display:inline-flex;background:#efece6;border-radius:11px;padding:4px;gap:4px;margin-left:6px;">
+        <button onClick="{{ onLaw }}" style="{{ lawTabStyle }}"><span style="width:15px;height:15px;display:inline-flex;">{{ lawSegIcon }}</span>법무팀</button>
+        <button onClick="{{ onTax }}" style="{{ taxTabStyle }}"><span style="width:15px;height:15px;display:inline-flex;">{{ taxSegIcon }}</span>세무팀</button>
+      </div>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:10px;position:relative;">
+        <sc-if value="{{ loggedOut }}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{ openAuth }}" style="padding:8px 16px;border-radius:10px;border:none;background:#102a43;color:#fff;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">로그인</button>
+        </sc-if>
+        <sc-if value="{{ loggedIn }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ toggleMenu }}" style="display:flex;align-items:center;gap:8px;padding:5px 11px 5px 5px;border-radius:999px;border:1px solid #e6e2da;background:#fff;font-family:inherit;cursor:pointer;">
+            <span style="width:28px;height:28px;border-radius:50%;background:#102a43;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:700;">{{ userInitial }}</span>
+            <span style="font-size:13.5px;font-weight:700;color:#22272e;">{{ userName }}님</span>
+          </button>
+          <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;top:48px;right:0;background:#fff;border:1px solid #e6e2da;border-radius:12px;box-shadow:0 16px 40px -16px rgba(0,0,0,.25);padding:6px;min-width:150px;z-index:60;">
+              <a href="saved.dc.html" style="display:block;padding:9px 12px;border-radius:8px;font-size:14px;font-weight:600;color:#3f4a55;text-decoration:none;">내 보관함</a>
+              <button onClick="{{ logout }}" style="width:100%;text-align:left;padding:9px 12px;border-radius:8px;border:none;background:transparent;font-size:14px;font-weight:600;color:#b04a3e;font-family:inherit;cursor:pointer;">로그아웃</button>
+            </div>
+          </sc-if>
+        </sc-if>
+      </div>
+    </div>
+    <div style="border-top:1px solid #f0ede7;">
+      <div style="max-width:1040px;margin:0 auto;padding:0 24px;display:flex;gap:4px;">
+        <a href="ai.dc.html" style="{{ navAsk }}">상담</a>
+        <a href="guides.dc.html" style="{{ navGuide }}">절차 가이드</a>
+        <a href="laws.dc.html" style="{{ navLib }}">자료실</a>
+        <a href="cases.dc.html" style="{{ navCase }}">판례</a>
+        <a href="saved.dc.html" style="{{ navSaved }}">보관함</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="chatscroll" ref="{{ scrollRef }}" style="flex:1;overflow-y:auto;">
+    <div style="max-width:760px;margin:0 auto;padding:26px 24px 36px;">
+
+      <sc-for list="{{ view }}" as="m" hint-placeholder-count="1">
+
+        <sc-if value="{{ m.isUser }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;justify-content:flex-end;margin-bottom:24px;">
+            <div style="background:#102a43;color:#fff;border-radius:18px 18px 5px 18px;padding:13px 17px;font-size:15px;line-height:1.65;max-width:520px;">{{ m.text }}</div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ m.isAi }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;gap:12px;margin-bottom:28px;">
+            <span style="flex-shrink:0;width:38px;height:38px;border-radius:11px;color:#fff;display:flex;align-items:center;justify-content:center;padding:9px;background:{{ accent }};">{{ teamIcon }}</span>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:12.5px;font-weight:700;color:#8a8579;margin-bottom:6px;">{{ teamLabel }}</div>
+              <div style="background:#fff;border:1px solid #ece9e3;border-radius:5px 16px 16px 16px;padding:17px 19px;font-size:15px;line-height:1.8;color:#2d3540;white-space:pre-wrap;box-shadow:0 4px 14px -10px rgba(16,42,67,.15);">{{ m.text }}</div>
+
+              <sc-if value="{{ m.hasStarters }}" hint-placeholder-val="{{ true }}">
+                <div style="display:flex;flex-direction:column;gap:8px;margin-top:14px;">
+                  <sc-for list="{{ m.starters }}" as="s" hint-placeholder-count="3">
+                    <button onClick="{{ s.onClick }}" style="text-align:left;background:#fff;border:1px solid #e3ded4;border-radius:12px;padding:13px 16px;font-size:14.5px;font-weight:600;color:#3f4a55;font-family:inherit;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:10px;" style-hover="border-color:#cbc4b6;background:#fcfbf9;">{{ s.text }}<span style="color:#bcb6a8;font-size:17px;">›</span></button>
+                  </sc-for>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ m.hasSources }}" hint-placeholder-val="{{ false }}">
+                <button onClick="{{ m.onToggle }}" style="{{ m.toggleStyle }}"><span style="width:5px;height:5px;border-radius:50%;background:{{ accent }};"></span>{{ m.toggleLabel }}</button>
+
+                <div style="display:{{ m.sourcesDisplay }};flex-direction:column;gap:10px;margin-top:14px;padding:16px;background:#f6f5f2;border:1px solid #ece9e3;border-radius:12px;">
+                  <div style="font-size:11.5px;font-weight:800;color:#9b958a;letter-spacing:.04em;">근거 법령·예규</div>
+                  <sc-for list="{{ m.laws }}" as="l" hint-placeholder-count="1">
+                    <div style="background:#fff;border:1px solid #ece9e3;border-radius:10px;padding:14px 16px;">
+                      <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px;flex-wrap:wrap;">
+                        <span style="font-size:11px;font-weight:800;color:#fff;padding:2px 8px;border-radius:5px;background:{{ accent }};">법령</span>
+                        <span style="font-weight:700;font-size:14.5px;color:#1b2530;">{{ l.title }}</span>
+                        <span class="mono" style="font-size:12.5px;font-weight:600;color:{{ accent }};">{{ l.article }}</span>
+                      </div>
+                      <div style="font-size:13.5px;line-height:1.7;color:#5b636d;margin-bottom:10px;">{{ l.body }}</div>
+                      <a href="law-detail.dc.html" style="font-size:12.5px;font-weight:700;text-decoration:none;color:{{ accent }};">법령 전문 보기 →</a>
+                    </div>
+                  </sc-for>
+                  <div style="font-size:11.5px;font-weight:800;color:#9b958a;letter-spacing:.04em;margin-top:6px;">참고 판례</div>
+                  <sc-for list="{{ m.cases }}" as="c" hint-placeholder-count="1">
+                    <div style="background:#fff;border:1px solid #ece9e3;border-radius:10px;padding:14px 16px;">
+                      <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px;flex-wrap:wrap;">
+                        <span style="font-size:11px;font-weight:800;color:#fff;background:#102a43;padding:2px 8px;border-radius:5px;">판례</span>
+                        <span style="font-weight:700;font-size:14.5px;color:#1b2530;">{{ c.name }}</span>
+                      </div>
+                      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:9px;font-size:12.5px;color:#8a96a3;">
+                        <span class="mono" style="color:#5a6675;font-weight:600;">{{ c.number }}</span>
+                        <span>{{ c.court }} · {{ c.date }}</span>
+                      </div>
+                      <div style="font-size:13.5px;line-height:1.7;color:#5b636d;margin-bottom:10px;">{{ c.summary }}</div>
+                      <a href="case-detail.dc.html" style="font-size:12.5px;font-weight:700;text-decoration:none;color:{{ accent }};">판례 상세 보기 →</a>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ m.savable }}" hint-placeholder-val="{{ false }}">
+                <div style="margin-top:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                  <button onClick="{{ m.onSave }}" style="{{ m.saveStyle }}">{{ m.saveLabel }}</button>
+                  <span style="font-size:12px;color:#a59f93;">{{ m.saveHint }}</span>
+                </div>
+              </sc-if>
+            </div>
+          </div>
+        </sc-if>
+
+      </sc-for>
+
+    </div>
+  </main>
+
+  <div style="flex-shrink:0;background:#fbfaf8;border-top:1px solid #ece9e3;">
+    <div style="max-width:760px;margin:0 auto;padding:14px 24px 18px;">
+      <div style="display:flex;align-items:flex-end;gap:10px;background:#fff;border:1px solid #e3ded4;border-radius:16px;padding:8px 8px 8px 16px;" style-focus-within="border-color:#bcb6a8;">
+        <textarea rows="1" placeholder="{{ inputPlaceholder }}" value="{{ draft }}" onInput="{{ onInput }}" onKeyDown="{{ onKey }}" style="flex:1;min-width:0;border:none;resize:none;background:transparent;font-family:inherit;font-size:15px;line-height:1.5;color:#22272e;padding:8px 0;max-height:120px;"></textarea>
+        <button onClick="{{ send }}" style="{{ sendStyle }}">전송</button>
+      </div>
+      <p style="margin:8px 4px 0;font-size:11.5px;color:#a59f93;text-align:center;">AI 답변은 참고용이며 법적 효력이 없습니다. 중요한 결정 전 변호사·세무사 등 전문가와 상담하세요.</p>
+    </div>
+  </div>
+
+  <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;bottom:96px;left:50%;transform:translateX(-50%);background:#1b2530;color:#fff;font-size:14px;font-weight:600;padding:12px 20px;border-radius:999px;box-shadow:0 12px 30px -10px rgba(0,0,0,.4);z-index:90;display:flex;align-items:center;gap:9px;">
+      <span style="width:18px;height:18px;border-radius:50%;background:#2bb673;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;">✓</span>{{ toast }}
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ authOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeAuth }}" style="position:fixed;inset:0;background:rgba(16,28,40,.5);display:flex;align-items:center;justify-content:center;padding:24px;z-index:100;">
+      <div onClick="{{ stop }}" style="background:#fff;border-radius:20px;padding:clamp(28px,4vw,40px);max-width:400px;width:100%;box-shadow:0 30px 70px -20px rgba(0,0,0,.5);">
+        <div style="width:46px;height:46px;border-radius:13px;background:#102a43;color:#fff;display:flex;align-items:center;justify-content:center;font-size:21px;font-weight:700;margin-bottom:18px;">法</div>
+        <h2 style="font-size:22px;font-weight:800;letter-spacing:-.02em;margin:0 0 8px;color:#1b2530;">상담을 저장하려면 로그인해 주세요</h2>
+        <p style="font-size:14px;color:#6b7480;margin:0 0 22px;line-height:1.6;">이름을 알려주시면 전담 팀이 맞이하고, 상담 내용을 보관함에 안전하게 저장해 드려요.</p>
+        <label style="display:block;font-size:12.5px;font-weight:700;color:#8a8579;margin-bottom:7px;">이름 또는 닉네임</label>
+        <input type="text" value="{{ authName }}" onInput="{{ authInput }}" onKeyDown="{{ authKey }}" placeholder="예) 김리걸" style="width:100%;border:1px solid #dcd7cd;border-radius:11px;padding:13px 15px;font-size:15px;font-family:inherit;color:#1b2530;background:#faf9f7;margin-bottom:18px;" style-focus="border-color:#102a43;background:#fff;">
+        <button onClick="{{ submitAuth }}" style="width:100%;border:none;border-radius:11px;background:#102a43;color:#fff;font-size:15.5px;font-weight:700;padding:14px;font-family:inherit;cursor:pointer;">시작하기</button>
+        <p style="font-size:11.5px;color:#a59f93;text-align:center;margin:14px 0 0;line-height:1.5;">데모용 로그인입니다. 입력 정보는 이 브라우저에만 저장됩니다.</p>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    let team = '법무', user = null;
+    try { const s = localStorage.getItem('legaly.team'); if (s === '법무' || s === '세무') team = s; } catch (e) {}
+    try { const u = localStorage.getItem('legaly.user'); if (u) user = JSON.parse(u); } catch (e) {}
+    this.state = { team, user, authOpen: false, menuOpen: false, authName: '', draft: '', expanded: {}, savedIds: {}, toast: '', messages: this.greeting(team, user) };
+  }
+
+  TEAMS = {
+    '법무': { accent: '#1b4f8a', soft: '#eaf1f8', softBorder: '#cfe0f1', label: '법무팀', glyph: '法', placeholder: '법률 고민을 편하게 적어주세요. (예: 권고사직과 해고는 어떻게 다른가요?)' },
+    '세무': { accent: '#157a57', soft: '#e7f3ec', softBorder: '#c5e3d3', label: '세무팀', glyph: '稅', placeholder: '세무 고민을 편하게 적어주세요. (예: 간이과세자도 세금계산서를 발행하나요?)' }
+  };
+
+  STARTERS = {
+    '법무': ['전세 계약이 끝났는데 보증금을 못 돌려받고 있어요.', '회사에서 부당하게 해고당한 것 같아요.', '상속 포기는 어떻게 신청하나요?'],
+    '세무': ['프리랜서 종합소득세 경비 처리가 궁금해요.', '1세대 1주택 양도세 비과세 요건이요.', '부가가치세 신고를 놓치면 어떻게 되나요?']
+  };
+
+  greeting(team, user) {
+    const c = this.TEAMS[team];
+    const name = user ? user.name + '님' : '고객님';
+    const intro = team === '세무'
+      ? (name + ', 안녕하세요. 세무팀입니다. 종합소득세·부가세·양도·상속 등 세금에 관한 일이라면 무엇이든 편하게 말씀해 주세요. 관련 세법 조문과 국세청 예규, 조세 판례를 근거로 함께 살펴드릴게요.')
+      : (name + ', 안녕하세요. 법무팀입니다. 계약·부동산·노동·가족 문제 등 어떤 법률 고민이든 편하게 말씀해 주세요. 관련 법령 조문과 실제 판례를 근거로 함께 살펴드릴게요.');
+    return [{ id: 'hi', role: 'ai', text: intro, starters: this.STARTERS[team] }];
+  }
+
+  answerFor(team, q) {
+    if (team === '세무') {
+      return {
+        text: '말씀해 주신 내용과 관련해 핵심을 정리해 드릴게요.\n\n사업과 관련해 지출한 비용은 적격증빙(세금계산서·계산서·신용카드·현금영수증)을 갖추면 필요경비로 인정되어 소득금액에서 공제됩니다. 장부를 작성하면 실제 경비를 모두 반영할 수 있어 절세에 유리하고, 장부가 없으면 단순·기준경비율로 추계됩니다(무기장가산세 주의). 증빙은 5년간 보관해야 합니다.\n\n매출 규모와 업종에 따라 적용 방식이 달라지니, 구체적인 수치는 함께 확인해 보시는 것을 권해요.',
+        sources: {
+          laws: [
+            { title: '소득세법', article: '제27조', body: '사업소득금액의 계산에 필요한 필요경비는 해당 과세기간의 총수입금액에 대응하는 비용으로서 일반적으로 용인되는 통상적인 것의 합계액으로 한다.' },
+            { title: '소득세법', article: '제160조', body: '사업자는 소득금액을 계산할 수 있도록 증명서류 등을 갖추어 두고 모든 거래 사실이 객관적으로 파악될 수 있도록 복식부기에 따라 장부를 기록·관리하여야 한다.' }
+          ],
+          cases: [{ name: '종합소득세부과처분취소 — 실질과세의 원칙', number: '2020두38744', court: '대법원', date: '2022. 5. 26. 선고', summary: '과세는 명목이 아닌 실질에 따라야 하므로, 실제 비용 지출 여부와 귀속을 사실관계에 근거해 판단하여야 한다.' }]
+        }
+      };
+    }
+    return {
+      text: '말씀해 주신 내용과 관련해 핵심을 정리해 드릴게요.\n\n임대차가 종료되었는데도 보증금을 받지 못하셨다면, ① 내용증명으로 반환을 청구해 지연이자 기산점을 확보하고, ② 임차권등기명령을 신청해 이사를 가더라도 대항력과 우선변제권을 유지한 뒤, ③ 보증금반환청구 소송을 진행하실 수 있어요. 보증금 반환과 주택 인도는 동시이행 관계입니다.\n\n전입신고와 점유를 갖춘 임차인의 대항력은 판례에서 폭넓게 인정되어, 집이 매매되어 임대인이 바뀌어도 새 소유자에게 반환을 청구할 수 있습니다.',
+      sources: {
+        laws: [
+          { title: '주택임대차보호법', article: '제3조의3', body: '임대차가 끝난 후 보증금을 반환받지 못한 임차인은 임차주택 소재지 관할 법원에 임차권등기명령을 신청할 수 있다. 등기가 마쳐지면 대항력과 우선변제권을 취득한다.' },
+          { title: '민법', article: '제536조', body: '쌍무계약의 당사자 일방은 상대방이 그 채무이행을 제공할 때까지 자기의 채무이행을 거절할 수 있다. (동시이행의 항변권)' }
+        ],
+        cases: [{ name: '임대차보증금 반환 — 대항력의 인정 범위', number: '2022다272053', court: '대법원', date: '2022. 4. 28. 선고', summary: '주택의 인도와 주민등록을 마친 임차인은 그 다음 날부터 대항력을 가지며, 임대인 지위가 승계되더라도 보증금반환채권은 유지된다.' }]
+      }
+    };
+  }
+
+  scrollRef = (el) => { this.scrollEl = el; };
+  componentDidMount() {
+    this.scrollBottom();
+    let pq = null;
+    try { pq = localStorage.getItem('legaly.pendingQ'); if (pq) localStorage.removeItem('legaly.pendingQ'); } catch (e) {}
+    if (pq) setTimeout(() => this.sendText(pq), 120);
+  }
+  componentDidUpdate(p, prev) { if (prev.messages !== this.state.messages) this.scrollBottom(); }
+  scrollBottom() { if (this.scrollEl) this.scrollEl.scrollTop = this.scrollEl.scrollHeight; }
+
+  setTeamLS = (t) => { try { localStorage.setItem('legaly.team', t); } catch (e) {} };
+  switchTeam = (t) => { this.setTeamLS(t); this.setState({ team: t, expanded: {}, messages: this.greeting(t, this.state.user) }); };
+  openAuth = () => this.setState({ authOpen: true, menuOpen: false });
+  closeAuth = () => this.setState({ authOpen: false });
+  authInput = (e) => this.setState({ authName: e.target.value });
+  authKey = (e) => { if (e.key === 'Enter') this.submitAuth(); };
+  submitAuth = () => {
+    const n = (this.state.authName || '').trim() || '고객';
+    const user = { name: n };
+    try { localStorage.setItem('legaly.user', JSON.stringify(user)); } catch (e) {}
+    this.setState({ user, authOpen: false, authName: '' }, () => { if (this.pendingSave) { const m = this.pendingSave; this.pendingSave = null; this.doSave(m); } });
+  };
+  toggleMenu = () => this.setState(s => ({ menuOpen: !s.menuOpen }));
+  logout = () => { try { localStorage.removeItem('legaly.user'); } catch (e) {} this.setState({ user: null, menuOpen: false }); };
+  stop = (e) => e.stopPropagation();
+  toggle = (id) => this.setState(s => ({ expanded: { ...s.expanded, [id]: !s.expanded[id] } }));
+  onInput = (e) => this.setState({ draft: e.target.value });
+  onKey = (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); this.send(); } };
+  send = () => { const t = this.state.draft.trim(); if (!t) return; this.setState({ draft: '' }); this.sendText(t); };
+
+  sendText = (t) => {
+    const team = this.state.team;
+    const uid = 'u' + Date.now();
+    const aid = 'a' + Date.now();
+    const ans = this.answerFor(team, t);
+    this.setState(s => ({
+      expanded: { ...s.expanded, [aid]: true },
+      messages: [...s.messages, { id: uid, role: 'user', text: t }, { id: aid, role: 'ai', q: t, text: ans.text, sources: ans.sources, savable: true }]
+    }));
+  };
+
+  getSaved() { try { return JSON.parse(localStorage.getItem('legaly.saved') || '[]'); } catch (e) { return []; } }
+  firstLines(text) { const t = text.replace(/\n+/g, ' ').trim(); return t.length > 120 ? t.slice(0, 120) + '…' : t; }
+  saveAnswer = (m) => { if (!this.state.user) { this.pendingSave = m; this.setState({ authOpen: true }); return; } this.doSave(m); };
+  doSave = (m) => {
+    const team = this.state.team;
+    const d = new Date();
+    const date = d.getFullYear() + '. ' + (d.getMonth() + 1) + '. ' + d.getDate() + '.';
+    const item = { id: m.id + '_' + Date.now(), team, title: m.q || '상담 기록', summary: this.firstLines(m.text), date };
+    const arr = this.getSaved(); arr.unshift(item);
+    try { localStorage.setItem('legaly.saved', JSON.stringify(arr)); } catch (e) {}
+    this.setState(s => ({ savedIds: { ...s.savedIds, [m.id]: true }, toast: '보관함에 저장했어요' }));
+    clearTimeout(this._t); this._t = setTimeout(() => this.setState({ toast: '' }), 2600);
+  };
+
+  IC = { scale: '<svg viewBox="0 0 24 24" width="100%" height="100%" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg>', calc: '<svg viewBox="0 0 24 24" width="100%" height="100%" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="20" x="4" y="2" rx="2"/><path d="M8 6h8"/><path d="M8 10h.01"/><path d="M12 10h.01"/><path d="M16 10h.01"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14v4"/><path d="M8 18h.01"/><path d="M12 18h.01"/></svg>' };
+  ic(svg) { if (!svg) return null; return React.createElement('span', { style: { display: 'inline-flex', width: '100%', height: '100%' }, dangerouslySetInnerHTML: { __html: svg } }); }
+
+  renderVals() {
+    const { team, user, authOpen, menuOpen, authName, draft, expanded, savedIds, toast, messages } = this.state;
+    const cfg = this.TEAMS[team];
+    const view = messages.map(m => {
+      const isUser = m.role === 'user';
+      const isAi = m.role === 'ai';
+      const open = !!expanded[m.id];
+      const sources = m.sources || null;
+      const laws = sources ? (sources.laws || []) : [];
+      const cases = sources ? (sources.cases || []) : [];
+      const count = laws.length + cases.length;
+      const isSaved = !!savedIds[m.id];
+      return {
+        id: m.id, text: m.text, isUser, isAi,
+        hasStarters: isAi && Array.isArray(m.starters) && m.starters.length > 0,
+        starters: (m.starters || []).map(s => ({ text: s, onClick: () => this.sendText(s) })),
+        hasSources: isAi && count > 0, laws, cases,
+        toggleLabel: open ? '근거 접기' : ('근거 ' + count + '건 펼쳐보기'),
+        sourcesDisplay: open ? 'flex' : 'none',
+        toggleStyle: 'margin-top:12px;display:inline-flex;align-items:center;gap:7px;padding:8px 14px;border-radius:9px;border:1px solid ' + cfg.softBorder + ';background:' + cfg.soft + ';color:' + cfg.accent + ';font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;',
+        onToggle: () => this.toggle(m.id),
+        savable: !!m.savable,
+        saveLabel: isSaved ? '보관함에 저장됨' : '이 상담 저장하기',
+        saveHint: isSaved ? '' : '나중에 보관함에서 다시 볼 수 있어요',
+        saveStyle: isSaved
+          ? 'display:inline-flex;align-items:center;gap:7px;padding:9px 15px;border-radius:10px;border:1px solid #d6e8dd;background:#eef6f1;color:#1b7a52;font-size:13px;font-weight:700;font-family:inherit;cursor:default;'
+          : 'display:inline-flex;align-items:center;gap:7px;padding:9px 15px;border-radius:10px;border:1px solid ' + cfg.softBorder + ';background:#fff;color:' + cfg.accent + ';font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;',
+        onSave: () => this.saveAnswer(m)
+      };
+    });
+    const tabBase = 'display:inline-flex;align-items:center;gap:6px;padding:7px 15px;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer;border:none;font-family:inherit;transition:.15s;';
+    const navBase = 'padding:13px 4px;margin-right:18px;font-size:14.5px;font-weight:700;text-decoration:none;border-bottom:2.5px solid transparent;';
+    const navOn = navBase + 'color:' + cfg.accent + ';border-bottom-color:' + cfg.accent + ';';
+    const navOff = navBase + 'color:#8a8579;';
+    return {
+      view, draft, toast,
+      accent: cfg.accent, soft: cfg.soft, teamLabel: cfg.label, teamGlyph: cfg.glyph,
+      inputPlaceholder: cfg.placeholder,
+      loggedIn: !!user, loggedOut: !user, userName: user ? user.name : '', userInitial: user ? user.name.slice(0, 1) : '',
+      authOpen, menuOpen, authName,
+      sendStyle: 'flex-shrink:0;border:none;border-radius:11px;background:' + cfg.accent + ';color:#fff;font-size:15px;font-weight:700;padding:11px 22px;cursor:pointer;font-family:inherit;',
+      lawTabStyle: tabBase + (team === '법무' ? 'background:#1b4f8a;color:#fff;box-shadow:0 2px 8px -2px rgba(27,79,138,.5);' : 'background:transparent;color:#6b6459;'),
+      taxTabStyle: tabBase + (team === '세무' ? 'background:#157a57;color:#fff;box-shadow:0 2px 8px -2px rgba(21,122,87,.5);' : 'background:transparent;color:#6b6459;'),
+      logoIcon: this.ic(this.IC.scale), lawSegIcon: this.ic(this.IC.scale), taxSegIcon: this.ic(this.IC.calc), teamIcon: this.ic(team === '법무' ? this.IC.scale : this.IC.calc),
+      navAsk: navOn, navGuide: navOff, navLib: navOff, navCase: navOff, navSaved: navOff,
+      onLaw: () => this.switchTeam('법무'), onTax: () => this.switchTeam('세무'),
+      openAuth: this.openAuth, closeAuth: this.closeAuth, authInput: this.authInput, authKey: this.authKey,
+      submitAuth: this.submitAuth, toggleMenu: this.toggleMenu, logout: this.logout, stop: this.stop,
+      send: this.send, onInput: this.onInput, onKey: this.onKey, scrollRef: this.scrollRef
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<style>
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:'Pretendard','Pretendard Variable',-apple-system,sans-serif;background:#f5f4f1;color:#22272e;-webkit-font-smoothing:antialiased;}
+  a{color:inherit;}
+  ::selection{background:#dbe7df;}
+  input:focus{outline:none;}
+</style>
+</helmet>
+
+<div style="min-height:100vh;display:flex;flex-direction:column;">
+
+  <header style="background:#fbfaf8;border-bottom:1px solid #ece9e3;">
+    <div style="max-width:1120px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:20px;height:66px;">
+      <a href="index.dc.html" style="display:flex;align-items:center;gap:11px;text-decoration:none;flex-shrink:0;">
+        <span style="width:38px;height:38px;border-radius:11px;background:#102a43;color:#fff;display:flex;align-items:center;justify-content:center;padding:9px;">{{ logoIcon }}</span>
+        <span style="display:flex;flex-direction:column;line-height:1.12;">
+          <span style="font-size:18px;font-weight:800;color:#102a43;letter-spacing:-.02em;">리걸리</span>
+          <span style="font-size:10.5px;font-weight:600;color:#9b958a;letter-spacing:-.01em;">나의 법무팀 &amp; 세무팀</span>
+        </span>
+      </a>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:10px;position:relative;">
+        <a href="guides.dc.html" style="font-size:14px;font-weight:700;color:#5b636d;text-decoration:none;padding:8px 6px;">절차 가이드</a>
+        <a href="ai.dc.html" style="font-size:14px;font-weight:700;color:#5b636d;text-decoration:none;padding:8px 6px;margin-right:4px;">AI 상담</a>
+        <sc-if value="{{ loggedOut }}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{ openAuth }}" style="padding:9px 18px;border-radius:10px;border:none;background:#102a43;color:#fff;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">로그인</button>
+        </sc-if>
+        <sc-if value="{{ loggedIn }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ toggleMenu }}" style="display:flex;align-items:center;gap:9px;padding:6px 12px 6px 6px;border-radius:999px;border:1px solid #e6e2da;background:#fff;font-family:inherit;cursor:pointer;">
+            <span style="width:30px;height:30px;border-radius:50%;background:#102a43;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;">{{ userInitial }}</span>
+            <span style="font-size:14px;font-weight:700;color:#22272e;">{{ userName }}님</span>
+          </button>
+          <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;top:52px;right:0;background:#fff;border:1px solid #e6e2da;border-radius:12px;box-shadow:0 16px 40px -16px rgba(0,0,0,.25);padding:6px;min-width:170px;z-index:60;">
+              <div style="padding:10px 12px 8px;font-size:12px;color:#a59f93;font-weight:600;border-bottom:1px solid #f0ede7;margin-bottom:4px;">{{ userName }}님</div>
+              <a href="saved.dc.html" style="display:block;padding:10px 12px;border-radius:8px;font-size:14px;font-weight:600;color:#3f4a55;text-decoration:none;">내 보관함</a>
+              <button onClick="{{ logout }}" style="width:100%;text-align:left;padding:10px 12px;border-radius:8px;border:none;background:transparent;font-size:14px;font-weight:600;color:#b04a3e;font-family:inherit;cursor:pointer;">로그아웃</button>
+            </div>
+          </sc-if>
+        </sc-if>
+      </div>
+    </div>
+  </header>
+
+  <main style="flex:1;max-width:1120px;width:100%;margin:0 auto;padding:clamp(32px,4.5vw,52px) 24px clamp(48px,7vw,80px);">
+
+    <section style="margin-bottom:clamp(40px,5vw,60px);">
+      <sc-if value="{{ loggedIn }}" hint-placeholder-val="{{ false }}">
+        <div style="font-size:13.5px;color:#a59f93;font-weight:600;margin-bottom:10px;">{{ today }}</div>
+        <h1 style="font-size:clamp(28px,4vw,42px);font-weight:800;letter-spacing:-.03em;margin:0 0 12px;color:#1b2530;line-height:1.25;">{{ userName }}님, 무엇을 도와드릴까요?</h1>
+        <p style="font-size:clamp(15px,2vw,18px);color:#6b7480;margin:0;line-height:1.6;">고민을 한마디로 적어주시면 전담 팀이 근거와 함께 답해드려요.</p>
+      </sc-if>
+      <sc-if value="{{ loggedOut }}" hint-placeholder-val="{{ true }}">
+        <h1 style="font-size:clamp(28px,4.4vw,46px);font-weight:800;letter-spacing:-.03em;margin:0 0 14px;color:#1b2530;line-height:1.2;">법이 필요한 순간,<br>혼자 막막하지 않게.</h1>
+        <p style="font-size:clamp(15px,2vw,18px);color:#6b7480;margin:0;line-height:1.6;max-width:580px;">고민을 한마디로 적어주시면, 전담 법무팀·세무팀이 관련 법령과 판례를 근거로 답해드려요.</p>
+      </sc-if>
+
+      <div style="background:#fff;border:1px solid #e3ded4;border-radius:18px;padding:clamp(16px,2.5vw,22px);max-width:700px;margin-top:24px;box-shadow:0 12px 32px -22px rgba(0,0,0,.3);">
+        <div style="font-size:12.5px;font-weight:700;color:#9b958a;margin-bottom:10px;">어느 팀에게 물어볼까요?</div>
+        <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
+          <button onClick="{{ pickLaw }}" style="{{ lawPickStyle }}"><span style="width:17px;height:17px;display:inline-flex;">{{ lawPickIcon }}</span>법무팀</button>
+          <button onClick="{{ pickTax }}" style="{{ taxPickStyle }}"><span style="width:17px;height:17px;display:inline-flex;">{{ taxPickIcon }}</span>세무팀</button>
+        </div>
+        <form onSubmit="{{ onAsk }}" style="display:flex;align-items:stretch;gap:8px;background:#f6f5f2;border:1px solid #e3ded4;border-radius:13px;padding:6px 6px 6px 14px;flex-wrap:wrap;" style-focus-within="border-color:#bcb6a8;background:#fff;">
+          <input type="text" value="{{ ask }}" onInput="{{ onAskInput }}" placeholder="{{ askPlaceholder }}" style="flex:1 1 260px;min-width:0;border:none;padding:11px 0;font-size:15.5px;font-family:inherit;color:#1b2530;background:transparent;">
+          <button type="submit" style="{{ askBtnStyle }}">물어보기 →</button>
+        </form>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;">
+          <sc-for list="{{ examples }}" as="ex" hint-placeholder-count="3">
+            <button onClick="{{ ex.onClick }}" style="font-size:13px;font-weight:600;color:#5b636d;background:#f6f5f2;border:1px solid #e9e6df;padding:7px 13px;border-radius:999px;font-family:inherit;cursor:pointer;" style-hover="border-color:#d6d1c7;">{{ ex.text }}</button>
+          </sc-for>
+        </div>
+      </div>
+    </section>
+
+    <section style="margin-bottom:clamp(40px,5vw,60px);">
+      <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:16px;gap:12px;">
+        <h2 style="font-size:clamp(19px,2.4vw,23px);font-weight:800;letter-spacing:-.02em;margin:0;color:#1b2530;">분야별로 둘러보기</h2>
+        <span style="font-size:13.5px;color:#9b958a;">분야를 누르면 관련 가이드를 모아봐요</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:11px;">
+        <sc-for list="{{ fields }}" as="f" hint-placeholder-count="8">
+          <a href="guides.dc.html" onClick="{{ f.onClick }}" style="text-decoration:none;background:#fff;border:1px solid #ece9e3;border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:12px;" style-hover="border-color:#dcd7cd;box-shadow:0 8px 22px -16px rgba(0,0,0,.2);transform:translateY(-2px);">
+            <span style="width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;padding:11px;background:{{ f.bg }};color:{{ f.fg }};">{{ f.iconEl }}</span>
+            <div>
+              <div style="font-size:15.5px;font-weight:700;color:#1b2530;">{{ f.name }}</div>
+              <div style="font-size:12px;color:#9b958a;margin-top:2px;">{{ f.teamLabel }}</div>
+            </div>
+          </a>
+        </sc-for>
+      </div>
+    </section>
+
+    <section>
+      <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:16px;gap:12px;">
+        <h2 style="font-size:clamp(19px,2.4vw,23px);font-weight:800;letter-spacing:-.02em;margin:0;color:#1b2530;">자주 찾는 절차 가이드</h2>
+        <a href="guides.dc.html" style="font-size:14px;font-weight:600;color:#6b7480;text-decoration:none;">전체 보기 →</a>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:13px;">
+        <sc-for list="{{ featured }}" as="g" hint-placeholder-count="6">
+          <a href="guide-detail.dc.html" onClick="{{ g.onOpen }}" style="text-decoration:none;background:#fff;border:1px solid #ece9e3;border-radius:16px;padding:20px;display:flex;flex-direction:column;" style-hover="border-color:#dcd7cd;box-shadow:0 10px 28px -16px rgba(0,0,0,.22);transform:translateY(-2px);">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+              <span style="width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;padding:10px;background:{{ g.bg }};color:{{ g.fg }};">{{ g.iconEl }}</span>
+              <span style="font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;background:{{ g.bg }};color:{{ g.fg }};">{{ g.field }}</span>
+            </div>
+            <div style="font-size:16.5px;font-weight:800;color:#1b2530;margin-bottom:6px;line-height:1.35;letter-spacing:-.01em;">{{ g.title }}</div>
+            <p style="font-size:13px;line-height:1.6;color:#6b7480;margin:0 0 14px;flex:1;">{{ g.summary }}</p>
+            <div style="display:flex;align-items:center;gap:12px;font-size:12px;color:#8a8579;font-weight:600;padding-top:13px;border-top:1px solid #f3f1ec;">
+              <span>{{ g.stepCount }}단계</span><span>⏱ {{ g.duration }}</span>
+            </div>
+          </a>
+        </sc-for>
+      </div>
+    </section>
+
+  </main>
+
+  <footer style="background:#0e2438;color:#9fb4c7;">
+    <div style="max-width:1120px;margin:0 auto;padding:34px 24px;display:flex;flex-wrap:wrap;gap:20px;justify-content:space-between;align-items:center;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="width:30px;height:30px;border-radius:8px;background:#1c3d5a;color:#fff;display:flex;align-items:center;justify-content:center;padding:7px;">{{ footIcon }}</span>
+        <span style="font-size:15px;font-weight:800;color:#fff;">리걸리</span>
+      </div>
+      <p style="font-size:12.5px;line-height:1.7;margin:0;max-width:540px;color:#7e93a6;">리걸리의 절차 가이드와 AI 답변은 법령·판례에 기반한 일반적 정보 제공용이며, 구체적 사건에 대한 법률·세무 자문이 아닙니다. 중요한 결정은 변호사·세무사 등 전문가와 상담하세요.</p>
+    </div>
+  </footer>
+
+  <sc-if value="{{ authOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeAuth }}" style="position:fixed;inset:0;background:rgba(16,28,40,.5);display:flex;align-items:center;justify-content:center;padding:24px;z-index:100;">
+      <div onClick="{{ stop }}" style="background:#fff;border-radius:20px;padding:clamp(28px,4vw,40px);max-width:400px;width:100%;box-shadow:0 30px 70px -20px rgba(0,0,0,.5);">
+        <div style="width:46px;height:46px;border-radius:13px;background:#102a43;color:#fff;display:flex;align-items:center;justify-content:center;padding:11px;margin-bottom:18px;">{{ logoIcon }}</div>
+        <h2 style="font-size:22px;font-weight:800;letter-spacing:-.02em;margin:0 0 8px;color:#1b2530;">리걸리 시작하기</h2>
+        <p style="font-size:14px;color:#6b7480;margin:0 0 22px;line-height:1.6;">이름을 알려주시면 전담 법무팀·세무팀이 맞이할게요. 상담 내용도 안전하게 보관됩니다.</p>
+        <label style="display:block;font-size:12.5px;font-weight:700;color:#8a8579;margin-bottom:7px;">이름 또는 닉네임</label>
+        <input type="text" value="{{ authName }}" onInput="{{ authInput }}" onKeyDown="{{ authKey }}" placeholder="예) 김리걸" style="width:100%;border:1px solid #dcd7cd;border-radius:11px;padding:13px 15px;font-size:15px;font-family:inherit;color:#1b2530;background:#faf9f7;margin-bottom:18px;" style-focus="border-color:#102a43;background:#fff;">
+        <button onClick="{{ submitAuth }}" style="width:100%;border:none;border-radius:11px;background:#102a43;color:#fff;font-size:15.5px;font-weight:700;padding:14px;font-family:inherit;cursor:pointer;">시작하기</button>
+        <p style="font-size:11.5px;color:#a59f93;text-align:center;margin:14px 0 0;line-height:1.5;">데모용 로그인입니다. 입력 정보는 이 브라우저에만 저장됩니다.</p>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    let user = null, askTeam = '법무';
+    try { const u = localStorage.getItem('legaly.user'); if (u) user = JSON.parse(u); } catch (e) {}
+    try { const t = localStorage.getItem('legaly.team'); if (t === '법무' || t === '세무') askTeam = t; } catch (e) {}
+    this.state = { user, askTeam, ask: '', guides: [], tints: {}, icon: {}, authOpen: false, menuOpen: false, authName: '' };
+  }
+
+  FIELDS = [
+    { name: '민법', field: '민사', team: '법무' },
+    { name: '형사', field: '형사', team: '법무' },
+    { name: '노동', field: '노동', team: '법무' },
+    { name: '부동산', field: '부동산', team: '법무' },
+    { name: '가사', field: '가사', team: '법무' },
+    { name: '소득세', field: '소득세', team: '세무' },
+    { name: '양도세', field: '양도', team: '세무' },
+    { name: '상속·증여', field: '상속·증여', team: '세무' }
+  ];
+
+  EXAMPLES = {
+    '법무': ['전세 보증금을 못 받고 있어요', '부당하게 해고당했어요', '상속을 포기하고 싶어요'],
+    '세무': ['종합소득세 경비 처리가 궁금해요', '1세대 1주택 양도세 비과세요', '상속세는 언제까지 신고하나요?']
+  };
+
+  componentDidMount() {
+    import('./guides-data.js').then(m => { this.setState({ guides: m.GUIDES, tints: m.FIELD_TINT, icon: m.ICON }); }).catch(() => {});
+  }
+
+  ic(svg, size) { if (!svg) return null; return React.createElement('span', { style: { display: 'inline-flex', width: '100%', height: '100%' }, dangerouslySetInnerHTML: { __html: svg } }); }
+
+  setTeamLS = (t) => { try { localStorage.setItem('legaly.team', t); } catch (e) {} };
+  setPending = (q) => { try { localStorage.setItem('legaly.pendingQ', q); } catch (e) {} };
+  pick = (t) => { this.setTeamLS(t); this.setState({ askTeam: t }); };
+  goField = (f) => { this.setTeamLS(f.team); try { localStorage.setItem('legaly.field', f.field); } catch (e) {} };
+  openGuide = (id, team) => { this.setTeamLS(team); try { localStorage.setItem('legaly.guide', id); } catch (e) {} };
+  onAskInput = (e) => this.setState({ ask: e.target.value });
+  onAsk = (e) => { e.preventDefault(); const t = (this.state.ask || '').trim(); this.setTeamLS(this.state.askTeam); if (t) this.setPending(t); window.location.href = 'ai.dc.html'; };
+  openAuth = () => this.setState({ authOpen: true, menuOpen: false });
+  closeAuth = () => this.setState({ authOpen: false });
+  authInput = (e) => this.setState({ authName: e.target.value });
+  authKey = (e) => { if (e.key === 'Enter') this.submitAuth(); };
+  submitAuth = () => { const n = (this.state.authName || '').trim() || '고객'; const user = { name: n }; try { localStorage.setItem('legaly.user', JSON.stringify(user)); } catch (e) {} this.setState({ user, authOpen: false, authName: '' }); };
+  toggleMenu = () => this.setState(s => ({ menuOpen: !s.menuOpen }));
+  logout = () => { try { localStorage.removeItem('legaly.user'); } catch (e) {} this.setState({ user: null, menuOpen: false }); };
+  stop = (e) => e.stopPropagation();
+
+  TEAMSOFT = { '법무': { accent: '#1b4f8a', soft: '#eaf1f8', label: '법무팀' }, '세무': { accent: '#157a57', soft: '#e7f3ec', label: '세무팀' } };
+
+  renderVals() {
+    const { user, askTeam, ask, guides, tints, icon, authOpen, menuOpen, authName } = this.state;
+    const now = new Date();
+    const days = ['일', '월', '화', '수', '목', '금', '토'];
+    const today = now.getFullYear() + '년 ' + (now.getMonth() + 1) + '월 ' + now.getDate() + '일 ' + days[now.getDay()] + '요일';
+    const accent = this.TEAMSOFT[askTeam].accent;
+
+    const fields = this.FIELDS.map(f => {
+      const t = tints[f.field] || { bg: '#eef1f5', fg: '#44506b', svg: null };
+      return { name: f.name, teamLabel: this.TEAMSOFT[f.team].label, bg: t.bg, fg: t.fg, iconEl: this.ic(t.svg), onClick: () => this.goField(f) };
+    });
+
+    const featOrder = ['deposit-return', 'unfair-dismissal', 'criminal-complaint', 'income-tax', 'inheritance-renounce', 'capital-gains'];
+    const featured = featOrder.map(id => guides.find(g => g.id === id)).filter(Boolean).map(g => {
+      const t = tints[g.field] || { bg: '#eef1f5', fg: '#44506b', svg: null };
+      return { title: g.title, summary: g.summary, field: g.field, duration: g.duration, stepCount: g.steps.length, bg: t.bg, fg: t.fg, iconEl: this.ic(t.svg), onOpen: () => this.openGuide(g.id, g.team) };
+    });
+
+    const examples = (this.EXAMPLES[askTeam] || []).map(x => ({ text: x, onClick: () => this.setState({ ask: x }) }));
+
+    const pickBase = 'display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:11px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:.15s;';
+    const lawOn = askTeam === '법무';
+    const taxOn = askTeam === '세무';
+
+    return {
+      loggedIn: !!user, loggedOut: !user,
+      userName: user ? user.name : '', userInitial: user ? user.name.slice(0, 1) : '',
+      today,
+      fields, featured, examples, ask,
+      askPlaceholder: askTeam === '세무' ? '예) 부가세 신고를 놓쳤는데 어떻게 하나요?' : '예) 전세 보증금을 돌려받지 못하고 있어요',
+      logoIcon: this.ic(icon.scale), footIcon: this.ic(icon.scale),
+      lawPickIcon: this.ic(icon.scale), taxPickIcon: this.ic(icon.calc),
+      lawPickStyle: pickBase + (lawOn ? 'background:#1b4f8a;color:#fff;' : 'background:#fff;color:#5b636d;border:1px solid #dcd7cd;'),
+      taxPickStyle: pickBase + (taxOn ? 'background:#157a57;color:#fff;' : 'background:#fff;color:#5b636d;border:1px solid #dcd7cd;'),
+      askBtnStyle: 'flex:0 0 auto;border:none;border-radius:11px;color:#fff;font-size:15px;font-weight:700;padding:0 22px;cursor:pointer;font-family:inherit;background:' + accent + ';',
+      pickLaw: () => this.pick('법무'), pickTax: () => this.pick('세무'),
+      onAsk: this.onAsk, onAskInput: this.onAskInput,
+      authOpen, menuOpen, authName,
+      openAuth: this.openAuth, closeAuth: this.closeAuth, authInput: this.authInput, authKey: this.authKey,
+      submitAuth: this.submitAuth, toggleMenu: this.toggleMenu, logout: this.logout, stop: this.stop
+    };
+  }
+}
+</script>
+</body>
+</html>

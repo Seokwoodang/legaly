@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<style>
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:'Pretendard','Pretendard Variable',-apple-system,sans-serif;background:#f5f4f1;color:#22272e;-webkit-font-smoothing:antialiased;}
+  a{color:inherit;}
+  ::selection{background:#dbe7df;}
+  .mono{font-family:'SF Mono',ui-monospace,'Menlo','Consolas',monospace;}
+  input:focus{outline:none;}
+</style>
+</helmet>
+
+<div style="min-height:100vh;display:flex;flex-direction:column;">
+
+  <header style="background:#fbfaf8;border-bottom:1px solid #ece9e3;position:sticky;top:0;z-index:50;">
+    <div style="max-width:1040px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:16px;height:60px;">
+      <a href="index.dc.html" style="display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0;">
+        <span style="width:34px;height:34px;border-radius:10px;background:#102a43;color:#fff;display:flex;align-items:center;justify-content:center;padding:8px;">{{ logoIcon }}</span>
+        <span style="font-size:17px;font-weight:800;color:#102a43;letter-spacing:-.02em;">리걸리</span>
+      </a>
+      <div style="display:inline-flex;background:#efece6;border-radius:11px;padding:4px;gap:4px;margin-left:6px;">
+        <button onClick="{{ onLaw }}" style="{{ lawTabStyle }}"><span style="width:15px;height:15px;display:inline-flex;">{{ lawSegIcon }}</span>법무팀</button>
+        <button onClick="{{ onTax }}" style="{{ taxTabStyle }}"><span style="width:15px;height:15px;display:inline-flex;">{{ taxSegIcon }}</span>세무팀</button>
+      </div>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:10px;position:relative;">
+        <sc-if value="{{ loggedOut }}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{ openAuth }}" style="padding:8px 16px;border-radius:10px;border:none;background:#102a43;color:#fff;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">로그인</button>
+        </sc-if>
+        <sc-if value="{{ loggedIn }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ toggleMenu }}" style="display:flex;align-items:center;gap:8px;padding:5px 11px 5px 5px;border-radius:999px;border:1px solid #e6e2da;background:#fff;font-family:inherit;cursor:pointer;">
+            <span style="width:28px;height:28px;border-radius:50%;background:#102a43;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:700;">{{ userInitial }}</span>
+            <span style="font-size:13.5px;font-weight:700;color:#22272e;">{{ userName }}님</span>
+          </button>
+          <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;top:48px;right:0;background:#fff;border:1px solid #e6e2da;border-radius:12px;box-shadow:0 16px 40px -16px rgba(0,0,0,.25);padding:6px;min-width:150px;z-index:60;">
+              <a href="index.dc.html" style="display:block;padding:9px 12px;border-radius:8px;font-size:14px;font-weight:600;color:#3f4a55;text-decoration:none;">홈으로</a>
+              <button onClick="{{ logout }}" style="width:100%;text-align:left;padding:9px 12px;border-radius:8px;border:none;background:transparent;font-size:14px;font-weight:600;color:#b04a3e;font-family:inherit;cursor:pointer;">로그아웃</button>
+            </div>
+          </sc-if>
+        </sc-if>
+      </div>
+    </div>
+    <div style="border-top:1px solid #f0ede7;">
+      <div style="max-width:1040px;margin:0 auto;padding:0 24px;display:flex;gap:4px;">
+        <a href="ai.dc.html" style="{{ navAsk }}">상담</a>
+        <a href="guides.dc.html" style="{{ navGuide }}">절차 가이드</a>
+        <a href="laws.dc.html" style="{{ navLib }}">자료실</a>
+        <a href="cases.dc.html" style="{{ navCase }}">판례</a>
+        <a href="saved.dc.html" style="{{ navSaved }}">보관함</a>
+      </div>
+    </div>
+  </header>
+
+  <main style="flex:1;max-width:1040px;width:100%;margin:0 auto;padding:clamp(32px,4vw,48px) 24px clamp(48px,7vw,72px);">
+
+    <div style="margin-bottom:22px;">
+      <h1 style="font-size:clamp(24px,3.4vw,34px);font-weight:800;letter-spacing:-.02em;margin:0 0 8px;color:#1b2530;">{{ pageTitle }}</h1>
+      <p style="font-size:15px;color:#6b7480;margin:0;">저장해 둔 상담을 다시 보고, 같은 주제로 이어서 상담할 수 있어요.</p>
+    </div>
+
+    <sc-if value="{{ hasAny }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;">
+        <button onClick="{{ filterAll }}" style="{{ fAll }}">전체 {{ countAll }}</button>
+        <button onClick="{{ filterLaw }}" style="{{ fLaw }}">법무팀 {{ countLaw }}</button>
+        <button onClick="{{ filterTax }}" style="{{ fTax }}">세무팀 {{ countTax }}</button>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <sc-for list="{{ items }}" as="it" hint-placeholder-count="3">
+          <div style="background:#fff;border:1px solid #ece9e3;border-radius:16px;padding:20px 22px;">
+            <div style="display:flex;align-items:center;gap:9px;margin-bottom:10px;">
+              <span style="font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:6px;color:{{ it.accent }};background:{{ it.soft }};">{{ it.teamLabel }}</span>
+              <span style="font-size:12.5px;color:#a59f93;">{{ it.date }}</span>
+            </div>
+            <div style="font-size:17px;font-weight:700;color:#1b2530;line-height:1.4;margin-bottom:8px;">{{ it.title }}</div>
+            <p style="font-size:14px;line-height:1.7;color:#6b7480;margin:0 0 16px;">{{ it.summary }}</p>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+              <a href="ai.dc.html" onClick="{{ it.onContinue }}" style="text-decoration:none;font-size:13.5px;font-weight:700;color:#fff;padding:9px 16px;border-radius:10px;background:{{ it.accent }};">이어서 상담하기</a>
+              <button onClick="{{ it.onDelete }}" style="font-size:13.5px;font-weight:600;color:#a08a86;background:transparent;border:none;font-family:inherit;cursor:pointer;padding:9px 4px;">삭제</button>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isEmpty }}" hint-placeholder-val="{{ true }}">
+      <div style="background:#fff;border:1px dashed #ddd8ce;border-radius:18px;padding:56px 24px;text-align:center;">
+        <div style="width:54px;height:54px;border-radius:15px;background:#f1efe9;color:#bcb6a8;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;margin:0 auto 16px;">＋</div>
+        <div style="font-size:17px;font-weight:700;color:#4a535d;margin-bottom:7px;">아직 저장된 상담이 없어요</div>
+        <p style="font-size:14.5px;color:#8a8579;line-height:1.6;margin:0 0 20px;max-width:380px;margin-left:auto;margin-right:auto;">팀에게 질문하고 답변 아래 <strong style="color:#6b7480;">‘이 상담 저장하기’</strong>를 누르면, 여기에서 언제든 다시 볼 수 있어요.</p>
+        <a href="ai.dc.html" style="display:inline-block;text-decoration:none;background:#102a43;color:#fff;font-size:15px;font-weight:700;padding:12px 24px;border-radius:11px;">상담 시작하기</a>
+      </div>
+    </sc-if>
+
+  </main>
+
+  <footer style="background:#0e2438;color:#9fb4c7;">
+    <div style="max-width:1040px;margin:0 auto;padding:32px 24px;font-size:12.5px;color:#7e93a6;line-height:1.7;">저장된 상담은 이 브라우저에만 보관됩니다. 리걸리의 답변은 참고용이며 구체적 사건의 법률·세무 자문이 아닙니다.</div>
+  </footer>
+
+  <sc-if value="{{ authOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeAuth }}" style="position:fixed;inset:0;background:rgba(16,28,40,.5);display:flex;align-items:center;justify-content:center;padding:24px;z-index:100;">
+      <div onClick="{{ stop }}" style="background:#fff;border-radius:20px;padding:clamp(28px,4vw,40px);max-width:400px;width:100%;box-shadow:0 30px 70px -20px rgba(0,0,0,.5);">
+        <div style="width:46px;height:46px;border-radius:13px;background:#102a43;color:#fff;display:flex;align-items:center;justify-content:center;font-size:21px;font-weight:700;margin-bottom:18px;">法</div>
+        <h2 style="font-size:22px;font-weight:800;letter-spacing:-.02em;margin:0 0 8px;color:#1b2530;">리걸리 시작하기</h2>
+        <p style="font-size:14px;color:#6b7480;margin:0 0 22px;line-height:1.6;">이름을 알려주시면 전담 법무팀·세무팀이 맞이할게요.</p>
+        <label style="display:block;font-size:12.5px;font-weight:700;color:#8a8579;margin-bottom:7px;">이름 또는 닉네임</label>
+        <input type="text" value="{{ authName }}" onInput="{{ authInput }}" onKeyDown="{{ authKey }}" placeholder="예) 김리걸" style="width:100%;border:1px solid #dcd7cd;border-radius:11px;padding:13px 15px;font-size:15px;font-family:inherit;color:#1b2530;background:#faf9f7;margin-bottom:18px;" style-focus="border-color:#102a43;background:#fff;">
+        <button onClick="{{ submitAuth }}" style="width:100%;border:none;border-radius:11px;background:#102a43;color:#fff;font-size:15.5px;font-weight:700;padding:14px;font-family:inherit;cursor:pointer;">시작하기</button>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    let team = '법무', user = null;
+    try { const s = localStorage.getItem('legaly.team'); if (s === '법무' || s === '세무') team = s; } catch (e) {}
+    try { const u = localStorage.getItem('legaly.user'); if (u) user = JSON.parse(u); } catch (e) {}
+    this.state = { team, user, filter: '전체', saved: this.getSaved(), authOpen: false, menuOpen: false, authName: '' };
+  }
+
+  TEAMS = {
+    '법무': { accent: '#1b4f8a', soft: '#eaf1f8', label: '법무팀' },
+    '세무': { accent: '#157a57', soft: '#e7f3ec', label: '세무팀' }
+  };
+
+  getSaved() { try { return JSON.parse(localStorage.getItem('legaly.saved') || '[]'); } catch (e) { return []; } }
+  setTeamLS = (t) => { try { localStorage.setItem('legaly.team', t); } catch (e) {} };
+  setPending = (q) => { try { localStorage.setItem('legaly.pendingQ', q); } catch (e) {} };
+  switchTeam = (t) => { this.setTeamLS(t); this.setState({ team: t }); };
+  setFilter = (f) => this.setState({ filter: f });
+  remove = (id) => { const arr = this.getSaved().filter(x => x.id !== id); try { localStorage.setItem('legaly.saved', JSON.stringify(arr)); } catch (e) {} this.setState({ saved: arr }); };
+  continueChat = (it) => { this.setTeamLS(it.team); this.setPending(it.title); };
+
+  openAuth = () => this.setState({ authOpen: true, menuOpen: false });
+  closeAuth = () => this.setState({ authOpen: false });
+  authInput = (e) => this.setState({ authName: e.target.value });
+  authKey = (e) => { if (e.key === 'Enter') this.submitAuth(); };
+  submitAuth = () => { const n = (this.state.authName || '').trim() || '고객'; const user = { name: n }; try { localStorage.setItem('legaly.user', JSON.stringify(user)); } catch (e) {} this.setState({ user, authOpen: false, authName: '' }); };
+  toggleMenu = () => this.setState(s => ({ menuOpen: !s.menuOpen }));
+  logout = () => { try { localStorage.removeItem('legaly.user'); } catch (e) {} this.setState({ user: null, menuOpen: false }); };
+  stop = (e) => e.stopPropagation();
+
+  IC = { scale: '<svg viewBox="0 0 24 24" width="100%" height="100%" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg>', calc: '<svg viewBox="0 0 24 24" width="100%" height="100%" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="20" x="4" y="2" rx="2"/><path d="M8 6h8"/><path d="M8 10h.01"/><path d="M12 10h.01"/><path d="M16 10h.01"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14v4"/><path d="M8 18h.01"/><path d="M12 18h.01"/></svg>' };
+  ic(svg) { if (!svg) return null; return React.createElement('span', { style: { display: 'inline-flex', width: '100%', height: '100%' }, dangerouslySetInnerHTML: { __html: svg } }); }
+
+  renderVals() {
+    const { team, user, filter, saved, authOpen, menuOpen, authName } = this.state;
+    const cfg = this.TEAMS[team];
+    const countAll = saved.length;
+    const countLaw = saved.filter(s => s.team === '법무').length;
+    const countTax = saved.filter(s => s.team === '세무').length;
+    const filtered = saved.filter(s => filter === '전체' || s.team === filter);
+    const items = filtered.map(s => {
+      const c = this.TEAMS[s.team] || cfg;
+      return { id: s.id, title: s.title, summary: s.summary, date: s.date, teamLabel: c.label, accent: c.accent, soft: c.soft, onContinue: () => this.continueChat(s), onDelete: () => this.remove(s.id) };
+    });
+    const tabBase = 'display:inline-flex;align-items:center;gap:6px;padding:7px 15px;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer;border:none;font-family:inherit;transition:.15s;';
+    const navBase = 'padding:13px 4px;margin-right:18px;font-size:14.5px;font-weight:700;text-decoration:none;border-bottom:2.5px solid transparent;';
+    const navOn = navBase + 'color:' + cfg.accent + ';border-bottom-color:' + cfg.accent + ';';
+    const navOff = navBase + 'color:#8a8579;';
+    const fBtn = (active) => 'padding:8px 15px;border-radius:999px;font-size:13.5px;font-weight:600;cursor:pointer;font-family:inherit;border:1px solid ' + (active ? '#102a43' : '#dcd7cd') + ';background:' + (active ? '#102a43' : '#fff') + ';color:' + (active ? '#fff' : '#5b636d') + ';';
+    return {
+      items, hasAny: countAll > 0, isEmpty: countAll === 0,
+      countAll, countLaw, countTax,
+      pageTitle: user ? (user.name + '님의 보관함') : '내 보관함',
+      accent: cfg.accent,
+      loggedIn: !!user, loggedOut: !user, userName: user ? user.name : '', userInitial: user ? user.name.slice(0, 1) : '',
+      authOpen, menuOpen, authName,
+      filterAll: () => this.setFilter('전체'), filterLaw: () => this.setFilter('법무'), filterTax: () => this.setFilter('세무'),
+      fAll: fBtn(filter === '전체'), fLaw: fBtn(filter === '법무'), fTax: fBtn(filter === '세무'),
+      lawTabStyle: tabBase + (team === '법무' ? 'background:#1b4f8a;color:#fff;box-shadow:0 2px 8px -2px rgba(27,79,138,.5);' : 'background:transparent;color:#6b6459;'),
+      taxTabStyle: tabBase + (team === '세무' ? 'background:#157a57;color:#fff;box-shadow:0 2px 8px -2px rgba(21,122,87,.5);' : 'background:transparent;color:#6b6459;'),
+      logoIcon: this.ic(this.IC.scale), lawSegIcon: this.ic(this.IC.scale), taxSegIcon: this.ic(this.IC.calc),
+      navAsk: navOff, navGuide: navOff, navLib: navOff, navCase: navOff, navSaved: navOn,
+      onLaw: () => this.switchTeam('법무'), onTax: () => this.switchTeam('세무'),
+      openAuth: this.openAuth, closeAuth: this.closeAuth, authInput: this.authInput, authKey: this.authKey,
+      submitAuth: this.submitAuth, toggleMenu: this.toggleMenu, logout: this.logout, stop: this.stop
+    };
+  }
+}
+</script>
+</body>
+</html>

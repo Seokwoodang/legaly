@@ -1,0 +1,13 @@
+{
+  "active": false,
+  "slug": "legaly-backend",
+  "tier": "full",
+  "mode": "checkpoint",
+  "scope": "build",
+  "specApproved": true,
+  "designApproved": true,
+  "testsApproved": true,
+  "reviewApproved": true,
+  "gate2Approved": true,
+  "docHome": "docs/spec-to-code/legaly-backend"
+}

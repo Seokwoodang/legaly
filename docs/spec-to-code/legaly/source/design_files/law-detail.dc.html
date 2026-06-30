@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<style>
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:'Pretendard','Pretendard Variable',-apple-system,sans-serif;background:#f5f4f1;color:#22272e;-webkit-font-smoothing:antialiased;}
+  a{color:inherit;}
+  ::selection{background:#dbe7df;}
+  .mono{font-family:'SF Mono',ui-monospace,'Menlo','Consolas',monospace;}
+  html{scroll-behavior:smooth;}
+  input:focus{outline:none;}
+</style>
+</helmet>
+
+<div style="min-height:100vh;display:flex;flex-direction:column;">
+
+  <header style="background:#fbfaf8;border-bottom:1px solid #ece9e3;position:sticky;top:0;z-index:50;">
+    <div style="max-width:1040px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:16px;height:60px;">
+      <a href="index.dc.html" style="display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0;">
+        <span style="width:34px;height:34px;border-radius:10px;background:#102a43;color:#fff;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;">法</span>
+        <span style="font-size:17px;font-weight:800;color:#102a43;letter-spacing:-.02em;">리걸리</span>
+      </a>
+      <div style="display:inline-flex;background:#efece6;border-radius:11px;padding:4px;gap:4px;margin-left:6px;">
+        <button onClick="{{ onLaw }}" style="{{ lawTabStyle }}"><span style="font-size:13px;">法</span>법무팀</button>
+        <button onClick="{{ onTax }}" style="{{ taxTabStyle }}"><span style="font-size:13px;">稅</span>세무팀</button>
+      </div>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:10px;position:relative;">
+        <sc-if value="{{ loggedOut }}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{ openAuth }}" style="padding:8px 16px;border-radius:10px;border:none;background:#102a43;color:#fff;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">로그인</button>
+        </sc-if>
+        <sc-if value="{{ loggedIn }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ toggleMenu }}" style="display:flex;align-items:center;gap:8px;padding:5px 11px 5px 5px;border-radius:999px;border:1px solid #e6e2da;background:#fff;font-family:inherit;cursor:pointer;">
+            <span style="width:28px;height:28px;border-radius:50%;background:#102a43;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:700;">{{ userInitial }}</span>
+            <span style="font-size:13.5px;font-weight:700;color:#22272e;">{{ userName }}님</span>
+          </button>
+          <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;top:48px;right:0;background:#fff;border:1px solid #e6e2da;border-radius:12px;box-shadow:0 16px 40px -16px rgba(0,0,0,.25);padding:6px;min-width:150px;z-index:60;">
+              <a href="saved.dc.html" style="display:block;padding:9px 12px;border-radius:8px;font-size:14px;font-weight:600;color:#3f4a55;text-decoration:none;">내 보관함</a>
+              <button onClick="{{ logout }}" style="width:100%;text-align:left;padding:9px 12px;border-radius:8px;border:none;background:transparent;font-size:14px;font-weight:600;color:#b04a3e;font-family:inherit;cursor:pointer;">로그아웃</button>
+            </div>
+          </sc-if>
+        </sc-if>
+      </div>
+    </div>
+    <div style="border-top:1px solid #f0ede7;">
+      <div style="max-width:1040px;margin:0 auto;padding:0 24px;display:flex;gap:4px;">
+        <a href="ai.dc.html" style="{{ navAsk }}">상담</a>
+        <a href="laws.dc.html" style="{{ navLib }}">자료실</a>
+        <a href="cases.dc.html" style="{{ navCase }}">판례</a>
+        <a href="saved.dc.html" style="{{ navSaved }}">보관함</a>
+      </div>
+    </div>
+  </header>
+
+  <div style="background:{{ soft }};border-bottom:1px solid #ece9e3;">
+    <div style="max-width:1000px;margin:0 auto;padding:clamp(24px,3.5vw,40px) 24px;">
+      <div style="font-size:13px;color:#6b7480;margin-bottom:14px;"><a href="laws.dc.html" style="color:#6b7480;text-decoration:none;">{{ teamLabel }} 자료실</a> <span style="opacity:.5;">/</span> {{ breadcrumbCat }}</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
+        <span style="font-size:12px;font-weight:700;color:#fff;padding:3px 10px;border-radius:6px;background:{{ accent }};">시행중</span>
+        <span style="font-size:12px;font-weight:600;color:#6b7480;background:#fff;padding:3px 10px;border-radius:6px;">{{ lawNo }}</span>
+      </div>
+      <h1 style="font-size:clamp(26px,4vw,38px);font-weight:800;letter-spacing:-.02em;margin:0 0 18px;color:#1b2530;">{{ lawName }}</h1>
+      <div style="display:flex;gap:clamp(20px,4vw,44px);flex-wrap:wrap;">
+        <div><div style="font-size:12px;color:#9b958a;margin-bottom:3px;">시행일</div><div class="mono" style="font-size:15px;font-weight:600;color:#2d3540;">{{ effDate }}</div></div>
+        <div><div style="font-size:12px;color:#9b958a;margin-bottom:3px;">소관부처</div><div style="font-size:15px;font-weight:600;color:#2d3540;">{{ ministry }}</div></div>
+        <div><div style="font-size:12px;color:#9b958a;margin-bottom:3px;">법령 종류</div><div style="font-size:15px;font-weight:600;color:#2d3540;">법률</div></div>
+      </div>
+    </div>
+  </div>
+
+  <main style="flex:1;max-width:1000px;width:100%;margin:0 auto;padding:clamp(26px,4vw,38px) 24px clamp(48px,7vw,72px);display:flex;gap:clamp(24px,4vw,40px);flex-wrap:wrap;align-items:flex-start;">
+
+    <aside style="flex:1 1 220px;max-width:260px;position:sticky;top:128px;">
+      <div style="background:#fff;border:1px solid #ece9e3;border-radius:16px;padding:16px;">
+        <div style="font-size:12px;font-weight:800;color:#9b958a;letter-spacing:.04em;margin-bottom:10px;padding:0 6px;">조문 목차</div>
+        <nav style="display:flex;flex-direction:column;gap:1px;max-height:58vh;overflow-y:auto;">
+          <sc-for list="{{ toc }}" as="t" hint-placeholder-count="8">
+            <a href="{{ t.href }}" onClick="{{ t.onClick }}" style="{{ t.style }}">
+              <span class="mono" style="font-size:11.5px;opacity:.7;flex-shrink:0;">{{ t.num }}</span>
+              <span style="font-size:13px;font-weight:600;">{{ t.title }}</span>
+            </a>
+          </sc-for>
+        </nav>
+      </div>
+    </aside>
+
+    <article style="flex:1 1 520px;min-width:0;">
+      <div style="background:#fff;border:1px solid #ece9e3;border-radius:18px;padding:clamp(24px,4vw,40px);">
+        <sc-for list="{{ articles }}" as="a" hint-placeholder-count="6">
+          <section id="{{ a.id }}" style="padding:22px 0;border-bottom:1px solid #f3f1ec;scroll-margin-top:128px;">
+            <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
+              <span class="mono" style="font-size:14px;font-weight:700;color:{{ accent }};">{{ a.num }}</span>
+              <h2 style="font-size:18px;font-weight:800;color:#1b2530;margin:0;">{{ a.title }}</h2>
+            </div>
+            <div style="font-size:15.5px;line-height:1.95;color:#3a424c;white-space:pre-wrap;">{{ a.body }}</div>
+          </section>
+        </sc-for>
+        <p style="font-size:12.5px;color:#a59f93;margin:20px 0 0;">— 이하 생략. 전체 조문은 국가법령정보센터에서 확인하실 수 있어요.</p>
+      </div>
+
+      <div style="margin-top:28px;">
+        <h3 style="font-size:19px;font-weight:800;color:#1b2530;margin:0 0 14px;">이 법령과 관련된 판례</h3>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <sc-for list="{{ relatedCases }}" as="c" hint-placeholder-count="2">
+            <a href="case-detail.dc.html" style="text-decoration:none;background:#fff;border:1px solid #ece9e3;border-radius:13px;padding:16px 18px;display:block;" style-hover="border-color:#dcd7cd;box-shadow:0 8px 22px -16px rgba(0,0,0,.22);">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap;">
+                <span style="font-size:11px;font-weight:800;color:#fff;background:#102a43;padding:2px 8px;border-radius:5px;">판례</span>
+                <span class="mono" style="font-size:12.5px;color:#8a8579;">{{ c.number }}</span>
+                <span style="font-size:12.5px;color:#8a8579;">{{ c.court }} · {{ c.date }}</span>
+              </div>
+              <div style="font-size:15px;font-weight:700;color:#1b2530;">{{ c.name }}</div>
+            </a>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="margin-top:24px;border-radius:16px;padding:20px 22px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;background:{{ soft }};border:1px solid {{ softBorder }};">
+        <div style="flex:1;min-width:200px;">
+          <div style="font-size:15px;font-weight:700;color:#1b2530;margin-bottom:3px;">이 법령, 내 상황엔 어떻게 적용될까요?</div>
+          <div style="font-size:13.5px;color:#5b636d;">{{ teamLabel }}에게 물어보면 내 상황에 맞춰 조문과 판례로 풀어드려요.</div>
+        </div>
+        <a href="ai.dc.html" style="flex-shrink:0;color:#fff;text-decoration:none;font-size:14px;font-weight:700;padding:11px 20px;border-radius:11px;background:{{ accent }};">{{ teamLabel }}에게 질문 →</a>
+      </div>
+    </article>
+
+  </main>
+
+  <sc-if value="{{ authOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeAuth }}" style="position:fixed;inset:0;background:rgba(16,28,40,.5);display:flex;align-items:center;justify-content:center;padding:24px;z-index:100;">
+      <div onClick="{{ stop }}" style="background:#fff;border-radius:20px;padding:clamp(28px,4vw,40px);max-width:400px;width:100%;box-shadow:0 30px 70px -20px rgba(0,0,0,.5);">
+        <div style="width:46px;height:46px;border-radius:13px;background:#102a43;color:#fff;display:flex;align-items:center;justify-content:center;font-size:21px;font-weight:700;margin-bottom:18px;">法</div>
+        <h2 style="font-size:22px;font-weight:800;letter-spacing:-.02em;margin:0 0 8px;color:#1b2530;">리걸리 시작하기</h2>
+        <p style="font-size:14px;color:#6b7480;margin:0 0 22px;line-height:1.6;">이름을 알려주시면 전담 법무팀·세무팀이 맞이할게요.</p>
+        <label style="display:block;font-size:12.5px;font-weight:700;color:#8a8579;margin-bottom:7px;">이름 또는 닉네임</label>
+        <input type="text" value="{{ authName }}" onInput="{{ authInput }}" onKeyDown="{{ authKey }}" placeholder="예) 김리걸" style="width:100%;border:1px solid #dcd7cd;border-radius:11px;padding:13px 15px;font-size:15px;font-family:inherit;color:#1b2530;background:#faf9f7;margin-bottom:18px;" style-focus="border-color:#102a43;background:#fff;">
+        <button onClick="{{ submitAuth }}" style="width:100%;border:none;border-radius:11px;background:#102a43;color:#fff;font-size:15.5px;font-weight:700;padding:14px;font-family:inherit;cursor:pointer;">시작하기</button>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    let team = '법무', user = null;
+    try { const s = localStorage.getItem('legaly.team'); if (s === '법무' || s === '세무') team = s; } catch (e) {}
+    try { const u = localStorage.getItem('legaly.user'); if (u) user = JSON.parse(u); } catch (e) {}
+    this.state = { team, user, active: team === '세무' ? 'tax2' : 'art1', authOpen: false, menuOpen: false, authName: '' };
+  }
+
+  TEAMS = {
+    '법무': { accent: '#1b4f8a', soft: '#eaf1f8', softBorder: '#cfe0f1', label: '법무팀' },
+    '세무': { accent: '#157a57', soft: '#e7f3ec', softBorder: '#c5e3d3', label: '세무팀' }
+  };
+
+  LAW = {
+    '법무': {
+      name: '주택임대차보호법', breadcrumbCat: '부동산', lawNo: '법률 제19356호', effDate: '2023. 07. 19.', ministry: '법무부',
+      articles: [
+        { id: 'art1', num: '제1조', title: '목적', body: '이 법은 주거용 건물의 임대차(賃貸借)에 관하여 「민법」에 대한 특례를 규정함으로써 국민 주거생활의 안정을 보장함을 목적으로 한다.' },
+        { id: 'art3', num: '제3조', title: '대항력 등', body: '① 임대차는 그 등기(登記)가 없는 경우에도 임차인이 주택의 인도(引渡)와 주민등록을 마친 때에는 그 다음 날부터 제3자에 대하여 효력이 생긴다. 이 경우 전입신고를 한 때에 주민등록이 된 것으로 본다.\n\n④ 임차주택의 양수인(讓受人)은 임대인의 지위를 승계한 것으로 본다.' },
+        { id: 'art3_3', num: '제3조의3', title: '임차권등기명령', body: '① 임대차가 끝난 후 보증금이 반환되지 아니한 경우 임차인은 임차주택의 소재지를 관할하는 지방법원·지방법원지원 또는 시·군 법원에 임차권등기명령을 신청할 수 있다.\n\n⑤ 임차인은 임차권등기명령의 집행에 따른 임차권등기를 마치면 제3조제1항에 따른 대항력과 우선변제권을 취득한다.' },
+        { id: 'art4', num: '제4조', title: '임대차기간 등', body: '① 기간을 정하지 아니하거나 2년 미만으로 정한 임대차는 그 기간을 2년으로 본다. 다만, 임차인은 2년 미만으로 정한 기간이 유효함을 주장할 수 있다.\n\n② 임대차기간이 끝난 경우에도 임차인이 보증금을 반환받을 때까지는 임대차관계가 존속되는 것으로 본다.' },
+        { id: 'art6_3', num: '제6조의3', title: '계약갱신 요구 등', body: '① 임대인은 임차인이 계약갱신을 요구할 경우 정당한 사유 없이 거절하지 못한다. 다만, 임대인(직계존속·직계비속을 포함한다)이 목적 주택에 실제 거주하려는 경우 등에는 그러하지 아니하다.\n\n② 임차인은 계약갱신요구권을 1회에 한하여 행사할 수 있다.' },
+        { id: 'art7', num: '제7조', title: '차임 등의 증감청구권', body: '① 당사자는 약정한 차임이나 보증금이 조세·공과금, 그 밖의 부담의 증감이나 경제사정의 변동으로 적절하지 아니하게 된 때에는 장래에 대하여 그 증감을 청구할 수 있다.\n\n② 증액청구는 약정한 차임이나 보증금의 20분의 1의 금액을 초과하지 못한다.' },
+        { id: 'art8', num: '제8조', title: '보증금 중 일정액의 보호', body: '① 임차인은 보증금 중 일정액을 다른 담보물권자보다 우선하여 변제받을 권리가 있다. 이 경우 임차인은 주택에 대한 경매신청의 등기 전에 제3조제1항의 요건을 갖추어야 한다.' }
+      ],
+      cases: [
+        { number: '2022다272053', court: '대법원', date: '2022. 4. 28.', name: '임대차보증금 반환 — 대항력의 인정 범위 (제3조)' },
+        { number: '2020다255078', court: '대법원', date: '2021. 1. 28.', name: '계약갱신 요구권의 행사와 실거주 사유 (제6조의3)' }
+      ]
+    },
+    '세무': {
+      name: '소득세법', breadcrumbCat: '소득세', lawNo: '법률 제20615호', effDate: '2025. 01. 01.', ministry: '기획재정부',
+      articles: [
+        { id: 'tax2', num: '제2조', title: '납세의무', body: '① 다음 각 호의 어느 하나에 해당하는 개인은 이 법에 따라 각자의 소득에 대한 소득세를 납부할 의무를 진다.\n  1. 거주자\n  2. 비거주자로서 국내원천소득이 있는 개인' },
+        { id: 'tax4', num: '제4조', title: '소득의 구분', body: '① 거주자의 소득은 다음과 같이 구분한다.\n  1. 종합소득: 이자·배당·사업·근로·연금·기타소득을 합산한 것\n  2. 퇴직소득\n  3. 양도소득' },
+        { id: 'tax14', num: '제14조', title: '과세표준의 계산', body: '② 종합소득에 대한 과세표준은 종합소득금액에서 종합소득공제를 적용한 금액으로 한다.\n\n③ 다음 각 호의 소득금액은 종합소득과세표준을 계산할 때 합산하지 아니한다.' },
+        { id: 'tax27', num: '제27조', title: '필요경비의 계산', body: '① 사업소득금액의 계산에 필요한 필요경비는 해당 과세기간의 총수입금액에 대응하는 비용으로서 일반적으로 용인되는 통상적인 것의 합계액으로 한다.\n\n② 해당 과세기간 전의 총수입금액에 대응하는 비용으로서 그 과세기간에 확정된 것에 대해서는 그 과세기간의 필요경비로 본다.' },
+        { id: 'tax55', num: '제55조', title: '세율', body: '① 거주자의 종합소득에 대한 소득세는 해당 연도의 종합소득과세표준에 다음의 세율을 적용하여 계산한 금액을 그 세액으로 한다. (6%~45%의 8단계 초과누진세율)' },
+        { id: 'tax70', num: '제70조', title: '종합소득과세표준 확정신고', body: '① 해당 과세기간의 종합소득금액이 있는 거주자는 그 과세표준을 그 과세기간의 다음 연도 5월 1일부터 5월 31일까지 납세지 관할 세무서장에게 신고하여야 한다.' },
+        { id: 'tax160', num: '제160조', title: '장부의 비치·기록', body: '① 사업자는 소득금액을 계산할 수 있도록 증명서류 등을 갖추어 두고 그 사업에 관한 모든 거래 사실이 객관적으로 파악될 수 있도록 복식부기에 따라 장부를 기록·관리하여야 한다.' }
+      ],
+      cases: [
+        { number: '2020두38744', court: '대법원', date: '2022. 5. 26.', name: '종합소득세부과처분취소 — 실질과세의 원칙 (제27조)' },
+        { number: '2021두44968', court: '대법원', date: '2022. 10. 27.', name: '양도소득세부과처분취소 — 1세대 1주택 비과세 (제4조)' }
+      ]
+    }
+  };
+
+  setTeamLS = (t) => { try { localStorage.setItem('legaly.team', t); } catch (e) {} };
+  switchTeam = (t) => { this.setTeamLS(t); this.setState({ team: t, active: this.LAW[t].articles[0].id }); };
+  go = (id) => this.setState({ active: id });
+  openAuth = () => this.setState({ authOpen: true, menuOpen: false });
+  closeAuth = () => this.setState({ authOpen: false });
+  authInput = (e) => this.setState({ authName: e.target.value });
+  authKey = (e) => { if (e.key === 'Enter') this.submitAuth(); };
+  submitAuth = () => { const n = (this.state.authName || '').trim() || '고객'; const user = { name: n }; try { localStorage.setItem('legaly.user', JSON.stringify(user)); } catch (e) {} this.setState({ user, authOpen: false, authName: '' }); };
+  toggleMenu = () => this.setState(s => ({ menuOpen: !s.menuOpen }));
+  logout = () => { try { localStorage.removeItem('legaly.user'); } catch (e) {} this.setState({ user: null, menuOpen: false }); };
+  stop = (e) => e.stopPropagation();
+
+  renderVals() {
+    const { team, user, active, authOpen, menuOpen, authName } = this.state;
+    const cfg = this.TEAMS[team];
+    const law = this.LAW[team];
+    const toc = law.articles.map(a => ({ num: a.num, title: a.title, href: '#' + a.id, style: 'display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;text-decoration:none;transition:.12s;' + (a.id === active ? ('background:' + cfg.soft + ';color:' + cfg.accent + ';') : 'color:#5b636d;'), onClick: () => this.go(a.id) }));
+    const tabBase = 'display:inline-flex;align-items:center;gap:6px;padding:7px 15px;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer;border:none;font-family:inherit;transition:.15s;';
+    const navBase = 'padding:13px 4px;margin-right:18px;font-size:14.5px;font-weight:700;text-decoration:none;border-bottom:2.5px solid transparent;';
+    const navOn = navBase + 'color:' + cfg.accent + ';border-bottom-color:' + cfg.accent + ';';
+    const navOff = navBase + 'color:#8a8579;';
+    return {
+      toc, articles: law.articles, relatedCases: law.cases,
+      lawName: law.name, breadcrumbCat: law.breadcrumbCat, lawNo: law.lawNo, effDate: law.effDate, ministry: law.ministry,
+      accent: cfg.accent, soft: cfg.soft, softBorder: cfg.softBorder, teamLabel: cfg.label,
+      loggedIn: !!user, loggedOut: !user, userName: user ? user.name : '', userInitial: user ? user.name.slice(0, 1) : '',
+      authOpen, menuOpen, authName,
+      lawTabStyle: tabBase + (team === '법무' ? 'background:#1b4f8a;color:#fff;box-shadow:0 2px 8px -2px rgba(27,79,138,.5);' : 'background:transparent;color:#6b6459;'),
+      taxTabStyle: tabBase + (team === '세무' ? 'background:#157a57;color:#fff;box-shadow:0 2px 8px -2px rgba(21,122,87,.5);' : 'background:transparent;color:#6b6459;'),
+      navAsk: navOff, navLib: navOn, navCase: navOff, navSaved: navOff,
+      onLaw: () => this.switchTeam('법무'), onTax: () => this.switchTeam('세무'),
+      openAuth: this.openAuth, closeAuth: this.closeAuth, authInput: this.authInput, authKey: this.authKey,
+      submitAuth: this.submitAuth, toggleMenu: this.toggleMenu, logout: this.logout, stop: this.stop
+    };
+  }
+}
+</script>
+</body>
+</html>

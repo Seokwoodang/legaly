@@ -1,0 +1,12 @@
+node_modules
+dist
+*.local
+.DS_Store
+test-results
+playwright-report
+tests/e2e/**/*-snapshots
+
+# supabase server secrets & local
+supabase/.env*
+supabase/.branches
+supabase/.temp

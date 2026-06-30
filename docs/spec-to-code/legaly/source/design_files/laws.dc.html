@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<style>
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:'Pretendard','Pretendard Variable',-apple-system,sans-serif;background:#f5f4f1;color:#22272e;-webkit-font-smoothing:antialiased;}
+  a{color:inherit;}
+  ::selection{background:#dbe7df;}
+  .mono{font-family:'SF Mono',ui-monospace,'Menlo','Consolas',monospace;}
+  input:focus{outline:none;}
+</style>
+</helmet>
+
+<div style="min-height:100vh;display:flex;flex-direction:column;">
+
+  <header style="background:#fbfaf8;border-bottom:1px solid #ece9e3;position:sticky;top:0;z-index:50;">
+    <div style="max-width:1040px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:16px;height:60px;">
+      <a href="index.dc.html" style="display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0;">
+        <span style="width:34px;height:34px;border-radius:10px;background:#102a43;color:#fff;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;">法</span>
+        <span style="font-size:17px;font-weight:800;color:#102a43;letter-spacing:-.02em;">리걸리</span>
+      </a>
+      <div style="display:inline-flex;background:#efece6;border-radius:11px;padding:4px;gap:4px;margin-left:6px;">
+        <button onClick="{{ onLaw }}" style="{{ lawTabStyle }}"><span style="font-size:13px;">法</span>법무팀</button>
+        <button onClick="{{ onTax }}" style="{{ taxTabStyle }}"><span style="font-size:13px;">稅</span>세무팀</button>
+      </div>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:10px;position:relative;">
+        <sc-if value="{{ loggedOut }}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{ openAuth }}" style="padding:8px 16px;border-radius:10px;border:none;background:#102a43;color:#fff;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">로그인</button>
+        </sc-if>
+        <sc-if value="{{ loggedIn }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ toggleMenu }}" style="display:flex;align-items:center;gap:8px;padding:5px 11px 5px 5px;border-radius:999px;border:1px solid #e6e2da;background:#fff;font-family:inherit;cursor:pointer;">
+            <span style="width:28px;height:28px;border-radius:50%;background:#102a43;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:700;">{{ userInitial }}</span>
+            <span style="font-size:13.5px;font-weight:700;color:#22272e;">{{ userName }}님</span>
+          </button>
+          <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;top:48px;right:0;background:#fff;border:1px solid #e6e2da;border-radius:12px;box-shadow:0 16px 40px -16px rgba(0,0,0,.25);padding:6px;min-width:150px;z-index:60;">
+              <a href="saved.dc.html" style="display:block;padding:9px 12px;border-radius:8px;font-size:14px;font-weight:600;color:#3f4a55;text-decoration:none;">내 보관함</a>
+              <button onClick="{{ logout }}" style="width:100%;text-align:left;padding:9px 12px;border-radius:8px;border:none;background:transparent;font-size:14px;font-weight:600;color:#b04a3e;font-family:inherit;cursor:pointer;">로그아웃</button>
+            </div>
+          </sc-if>
+        </sc-if>
+      </div>
+    </div>
+    <div style="border-top:1px solid #f0ede7;">
+      <div style="max-width:1040px;margin:0 auto;padding:0 24px;display:flex;gap:4px;">
+        <a href="ai.dc.html" style="{{ navAsk }}">상담</a>
+        <a href="laws.dc.html" style="{{ navLib }}">자료실</a>
+        <a href="cases.dc.html" style="{{ navCase }}">판례</a>
+        <a href="saved.dc.html" style="{{ navSaved }}">보관함</a>
+      </div>
+    </div>
+  </header>
+
+  <section style="background:{{ soft }};border-bottom:1px solid #ece9e3;">
+    <div style="max-width:1040px;margin:0 auto;padding:clamp(28px,4vw,44px) 24px;">
+      <div style="display:flex;align-items:center;gap:7px;font-size:13px;color:{{ accent }};font-weight:700;margin-bottom:10px;"><span style="width:22px;height:22px;border-radius:7px;background:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:12px;">{{ teamGlyph }}</span>{{ teamLabel }} 자료실</div>
+      <h1 style="font-size:clamp(24px,3.4vw,34px);font-weight:800;letter-spacing:-.02em;margin:0 0 8px;color:#1b2530;">{{ heroTitle }}</h1>
+      <p style="font-size:15px;color:#5b636d;margin:0 0 22px;">{{ heroSub }}</p>
+      <div style="display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #e3ded4;border-radius:13px;padding:6px;max-width:560px;">
+        <span style="padding-left:12px;color:#a59f93;font-size:17px;">⌕</span>
+        <input type="text" placeholder="{{ searchPlaceholder }}" value="{{ query }}" onInput="{{ onSearch }}" style="flex:1;min-width:0;border:none;padding:11px 4px;font-size:15px;font-family:inherit;color:#1b2530;background:transparent;">
+      </div>
+    </div>
+  </section>
+
+  <main style="flex:1;max-width:1040px;width:100%;margin:0 auto;padding:24px 24px clamp(48px,7vw,72px);">
+
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:18px;">
+      <sc-for list="{{ chips }}" as="c" hint-placeholder-count="8">
+        <button onClick="{{ c.onClick }}" style="{{ c.style }}">{{ c.name }}</button>
+      </sc-for>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid #e6e2da;">
+      <div style="font-size:14px;color:#6b7480;">총 <strong style="color:#1b2530;font-weight:800;">{{ count }}</strong>건</div>
+      <div style="display:flex;gap:6px;">
+        <button onClick="{{ sortName }}" style="{{ sortNameStyle }}">가나다순</button>
+        <button onClick="{{ sortDate }}" style="{{ sortDateStyle }}">시행일순</button>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <sc-for list="{{ results }}" as="r" hint-placeholder-count="6">
+        <a href="law-detail.dc.html" style="text-decoration:none;background:#fff;border:1px solid #ece9e3;border-radius:14px;padding:18px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;" style-hover="border-color:#dcd7cd;box-shadow:0 8px 24px -16px rgba(0,0,0,.22);">
+          <span style="flex-shrink:0;width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;background:{{ soft }};color:{{ accent }};">{{ r.glyph }}</span>
+          <div style="flex:1;min-width:200px;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap;">
+              <span style="font-size:17px;font-weight:700;color:#1b2530;">{{ r.name }}</span>
+              <span style="font-size:11.5px;font-weight:700;padding:2px 9px;border-radius:6px;color:{{ accent }};background:{{ soft }};">{{ r.field }}</span>
+              <span style="{{ r.kindStyle }}">{{ r.kind }}</span>
+            </div>
+            <div style="font-size:13px;color:#8a8579;">소관 · {{ r.ministry }}</div>
+          </div>
+          <div style="text-align:right;flex-shrink:0;">
+            <div style="font-size:11px;color:#b0a99c;margin-bottom:2px;">시행일</div>
+            <div class="mono" style="font-size:13.5px;color:#5b636d;font-weight:600;">{{ r.date }}</div>
+          </div>
+          <span style="color:#c8c1b4;font-size:20px;flex-shrink:0;">›</span>
+        </a>
+      </sc-for>
+    </div>
+
+    <sc-if value="{{ empty }}" hint-placeholder-val="{{ false }}">
+      <div style="text-align:center;padding:60px 20px;color:#9b958a;font-size:15px;">검색 결과가 없어요. 다른 키워드로 찾아보시겠어요?</div>
+    </sc-if>
+
+    <div style="margin-top:28px;border-radius:16px;padding:22px 24px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;background:#fff;border:1px solid #ece9e3;">
+      <div style="flex:1;min-width:200px;">
+        <div style="font-size:15.5px;font-weight:700;color:#1b2530;margin-bottom:3px;">찾는 자료가 어려우신가요?</div>
+        <div style="font-size:13.5px;color:#6b7480;">{{ teamLabel }}에게 바로 물어보시면 관련 조문과 판례를 근거로 풀어드릴게요.</div>
+      </div>
+      <a href="ai.dc.html" style="flex-shrink:0;color:#fff;text-decoration:none;font-size:14px;font-weight:700;padding:12px 20px;border-radius:11px;background:{{ accent }};">{{ teamLabel }}에게 질문하기 →</a>
+    </div>
+
+  </main>
+
+  <sc-if value="{{ authOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeAuth }}" style="position:fixed;inset:0;background:rgba(16,28,40,.5);display:flex;align-items:center;justify-content:center;padding:24px;z-index:100;">
+      <div onClick="{{ stop }}" style="background:#fff;border-radius:20px;padding:clamp(28px,4vw,40px);max-width:400px;width:100%;box-shadow:0 30px 70px -20px rgba(0,0,0,.5);">
+        <div style="width:46px;height:46px;border-radius:13px;background:#102a43;color:#fff;display:flex;align-items:center;justify-content:center;font-size:21px;font-weight:700;margin-bottom:18px;">法</div>
+        <h2 style="font-size:22px;font-weight:800;letter-spacing:-.02em;margin:0 0 8px;color:#1b2530;">리걸리 시작하기</h2>
+        <p style="font-size:14px;color:#6b7480;margin:0 0 22px;line-height:1.6;">이름을 알려주시면 전담 법무팀·세무팀이 맞이할게요.</p>
+        <label style="display:block;font-size:12.5px;font-weight:700;color:#8a8579;margin-bottom:7px;">이름 또는 닉네임</label>
+        <input type="text" value="{{ authName }}" onInput="{{ authInput }}" onKeyDown="{{ authKey }}" placeholder="예) 김리걸" style="width:100%;border:1px solid #dcd7cd;border-radius:11px;padding:13px 15px;font-size:15px;font-family:inherit;color:#1b2530;background:#faf9f7;margin-bottom:18px;" style-focus="border-color:#102a43;background:#fff;">
+        <button onClick="{{ submitAuth }}" style="width:100%;border:none;border-radius:11px;background:#102a43;color:#fff;font-size:15.5px;font-weight:700;padding:14px;font-family:inherit;cursor:pointer;">시작하기</button>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    let team = '법무', user = null;
+    try { const s = localStorage.getItem('legaly.team'); if (s === '법무' || s === '세무') team = s; } catch (e) {}
+    try { const u = localStorage.getItem('legaly.user'); if (u) user = JSON.parse(u); } catch (e) {}
+    this.state = { team, user, field: '전체', query: '', sort: 'name', authOpen: false, menuOpen: false, authName: '' };
+  }
+
+  TEAMS = {
+    '법무': {
+      accent: '#1b4f8a', soft: '#eaf1f8', label: '법무팀', glyph: '法',
+      heroTitle: '법령과 자료 찾아보기', heroSub: '계약·부동산·노동·형사 등 분야별 현행 법령을 살펴보세요.',
+      searchPlaceholder: '법령명으로 검색 (예: 임대차, 근로, 상속)',
+      chips: ['전체', '민사', '형사', '상사', '노동', '행정', '부동산', '가사'],
+      data: [
+        { name: '민법', field: '민사', ministry: '법무부', date: '2024. 05. 17.', glyph: '民', kind: '법령' },
+        { name: '민사소송법', field: '민사', ministry: '법무부', date: '2023. 10. 19.', glyph: '民', kind: '법령' },
+        { name: '형법', field: '형사', ministry: '법무부', date: '2024. 02. 09.', glyph: '刑', kind: '법령' },
+        { name: '형사소송법', field: '형사', ministry: '법무부', date: '2024. 02. 13.', glyph: '刑', kind: '법령' },
+        { name: '상법', field: '상사', ministry: '법무부', date: '2025. 01. 31.', glyph: '商', kind: '법령' },
+        { name: '근로기준법', field: '노동', ministry: '고용노동부', date: '2025. 10. 22.', glyph: '勞', kind: '법령' },
+        { name: '노동조합 및 노동관계조정법', field: '노동', ministry: '고용노동부', date: '2024. 05. 17.', glyph: '勞', kind: '법령' },
+        { name: '행정절차법', field: '행정', ministry: '행정안전부', date: '2023. 03. 24.', glyph: '行', kind: '법령' },
+        { name: '도로교통법', field: '행정', ministry: '경찰청', date: '2025. 06. 04.', glyph: '行', kind: '법령' },
+        { name: '개인정보 보호법', field: '행정', ministry: '개인정보보호위원회', date: '2024. 03. 15.', glyph: '行', kind: '법령' },
+        { name: '주택임대차보호법', field: '부동산', ministry: '법무부', date: '2023. 07. 19.', glyph: '不', kind: '법령' },
+        { name: '가족관계의 등록 등에 관한 법률', field: '가사', ministry: '법원행정처', date: '2024. 09. 20.', glyph: '家', kind: '법령' }
+      ]
+    },
+    '세무': {
+      accent: '#157a57', soft: '#e7f3ec', label: '세무팀', glyph: '稅',
+      heroTitle: '세법과 자료 찾아보기', heroSub: '세법·국세 관련 법령과 국세청 예규·집행기준을 살펴보세요.',
+      searchPlaceholder: '세법명·자료명으로 검색 (예: 소득세, 부가세, 상속)',
+      chips: ['전체', '소득세', '법인세', '부가세', '상속·증여', '국세일반', '지방세'],
+      data: [
+        { name: '국세기본법', field: '국세일반', ministry: '기획재정부', date: '2025. 01. 01.', glyph: '稅', kind: '법령' },
+        { name: '국세징수법', field: '국세일반', ministry: '기획재정부', date: '2025. 01. 01.', glyph: '稅', kind: '법령' },
+        { name: '조세특례제한법', field: '국세일반', ministry: '기획재정부', date: '2025. 01. 01.', glyph: '稅', kind: '법령' },
+        { name: '소득세법', field: '소득세', ministry: '기획재정부', date: '2025. 01. 01.', glyph: '稅', kind: '법령' },
+        { name: '법인세법', field: '법인세', ministry: '기획재정부', date: '2025. 01. 01.', glyph: '稅', kind: '법령' },
+        { name: '부가가치세법', field: '부가세', ministry: '기획재정부', date: '2025. 01. 01.', glyph: '稅', kind: '법령' },
+        { name: '상속세 및 증여세법', field: '상속·증여', ministry: '기획재정부', date: '2025. 01. 01.', glyph: '稅', kind: '법령' },
+        { name: '종합부동산세법', field: '국세일반', ministry: '기획재정부', date: '2025. 01. 01.', glyph: '稅', kind: '법령' },
+        { name: '지방세법', field: '지방세', ministry: '행정안전부', date: '2025. 01. 01.', glyph: '稅', kind: '법령' },
+        { name: '소득세 집행기준 27-55-1 (필요경비의 범위)', field: '소득세', ministry: '국세청', date: '2024. 07. 01.', glyph: '例', kind: '예규' },
+        { name: '부가가치세법 기본통칙 39-… (매입세액 불공제)', field: '부가세', ministry: '국세청', date: '2023. 12. 01.', glyph: '例', kind: '예규' }
+      ]
+    }
+  };
+
+  setTeamLS = (t) => { try { localStorage.setItem('legaly.team', t); } catch (e) {} };
+  switchTeam = (t) => { this.setTeamLS(t); this.setState({ team: t, field: '전체' }); };
+  setField = (f) => this.setState({ field: f });
+  onSearch = (e) => this.setState({ query: e.target.value });
+  setSort = (s) => this.setState({ sort: s });
+  openAuth = () => this.setState({ authOpen: true, menuOpen: false });
+  closeAuth = () => this.setState({ authOpen: false });
+  authInput = (e) => this.setState({ authName: e.target.value });
+  authKey = (e) => { if (e.key === 'Enter') this.submitAuth(); };
+  submitAuth = () => { const n = (this.state.authName || '').trim() || '고객'; const user = { name: n }; try { localStorage.setItem('legaly.user', JSON.stringify(user)); } catch (e) {} this.setState({ user, authOpen: false, authName: '' }); };
+  toggleMenu = () => this.setState(s => ({ menuOpen: !s.menuOpen }));
+  logout = () => { try { localStorage.removeItem('legaly.user'); } catch (e) {} this.setState({ user: null, menuOpen: false }); };
+  stop = (e) => e.stopPropagation();
+
+  renderVals() {
+    const { team, user, field, query, sort, authOpen, menuOpen, authName } = this.state;
+    const cfg = this.TEAMS[team];
+    const q = query.trim();
+    let results = cfg.data.filter(d => (field === '전체' || d.field === field) && (q === '' || d.name.includes(q)));
+    if (sort === 'name') results = [...results].sort((a, b) => a.name.localeCompare(b.name, 'ko'));
+    else results = [...results].sort((a, b) => b.date.localeCompare(a.date));
+    results = results.map(r => ({ ...r, kindStyle: r.kind === '예규' ? ('font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;color:' + cfg.accent + ';background:#fff;border:1px solid ' + cfg.accent + '33;') : 'font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;color:#8a8579;background:#f1efe9;' }));
+
+    const chips = cfg.chips.map(f => ({ name: f, active: f === field, style: 'padding:7px 15px;border-radius:999px;font-size:13.5px;font-weight:600;cursor:pointer;font-family:inherit;transition:.15s;border:1px solid ' + (f === field ? '#102a43' : '#dcd7cd') + ';background:' + (f === field ? '#102a43' : '#fff') + ';color:' + (f === field ? '#fff' : '#5b636d') + ';', onClick: () => this.setField(f) }));
+    const sortBtn = (active) => 'padding:6px 13px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;border:1px solid ' + (active ? cfg.accent : '#dcd7cd') + ';background:' + (active ? cfg.soft : '#fff') + ';color:' + (active ? cfg.accent : '#6b7480') + ';';
+    const tabBase = 'display:inline-flex;align-items:center;gap:6px;padding:7px 15px;border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer;border:none;font-family:inherit;transition:.15s;';
+    const navBase = 'padding:13px 4px;margin-right:18px;font-size:14.5px;font-weight:700;text-decoration:none;border-bottom:2.5px solid transparent;';
+    const navOn = navBase + 'color:' + cfg.accent + ';border-bottom-color:' + cfg.accent + ';';
+    const navOff = navBase + 'color:#8a8579;';
+
+    return {
+      results, chips, query,
+      accent: cfg.accent, soft: cfg.soft, teamLabel: cfg.label, teamGlyph: cfg.glyph,
+      heroTitle: cfg.heroTitle, heroSub: cfg.heroSub, searchPlaceholder: cfg.searchPlaceholder,
+      count: results.length, empty: results.length === 0,
+      loggedIn: !!user, loggedOut: !user, userName: user ? user.name : '', userInitial: user ? user.name.slice(0, 1) : '',
+      authOpen, menuOpen, authName,
+      onSearch: this.onSearch,
+      sortName: () => this.setSort('name'), sortDate: () => this.setSort('date'),
+      sortNameStyle: sortBtn(sort === 'name'), sortDateStyle: sortBtn(sort === 'date'),
+      lawTabStyle: tabBase + (team === '법무' ? 'background:#1b4f8a;color:#fff;box-shadow:0 2px 8px -2px rgba(27,79,138,.5);' : 'background:transparent;color:#6b6459;'),
+      taxTabStyle: tabBase + (team === '세무' ? 'background:#157a57;color:#fff;box-shadow:0 2px 8px -2px rgba(21,122,87,.5);' : 'background:transparent;color:#6b6459;'),
+      navAsk: navOff, navLib: navOn, navCase: navOff, navSaved: navOff,
+      onLaw: () => this.switchTeam('법무'), onTax: () => this.switchTeam('세무'),
+      openAuth: this.openAuth, closeAuth: this.closeAuth, authInput: this.authInput, authKey: this.authKey,
+      submitAuth: this.submitAuth, toggleMenu: this.toggleMenu, logout: this.logout, stop: this.stop
+    };
+  }
+}
+</script>
+</body>
+</html>
